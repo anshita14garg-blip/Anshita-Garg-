@@ -1,66 +1,942 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Builder</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Your CSS -->
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<div class="container py-5">
-    
-    <div class="card p-4 shadow-lg mx-auto" style="max-width: 700px;">
-        <h2 class="text-center mb-4">Resume Builder</h2>
-
-        <!-- Basic Info -->
-        <input type="text" id="name" class="form-control mb-2" placeholder="Full Name">
-        <input type="text" id="linkedin" class="form-control mb-2" placeholder="LinkedIn URL">
-        <input type="text" id="phone" class="form-control mb-2" placeholder="Phone Number">
-        <input type="email" id="email" class="form-control mb-3" placeholder="Email">
-
-        <!-- Education -->
-        <textarea id="education" class="form-control mb-3" placeholder="Education"></textarea>
-
-        <!-- Skills -->
-        <h5>Skills</h5>
-        <div id="skillsSection">
-            <input type="text" class="form-control mb-2 skill" placeholder="Enter Skill">
-        </div>
-        <button onclick="addSkill()" class="btn btn-secondary mb-3">+ Add Skill</button>
-
-        <!-- Projects -->
-        <h5>Projects</h5>
-        <div id="projectSection">
-            <input type="text" class="form-control mb-2 project" placeholder="Enter Project">
-        </div>
-        <button onclick="addProject()" class="btn btn-secondary mb-3">+ Add Project</button>
-
-        <!-- Achievements -->
-        <textarea id="achievements" class="form-control mb-3" placeholder="Achievements"></textarea>
-
-        <!-- Buttons -->
-        <button onclick="generateAndDownload()" class="btn btn-dark w-100">
-    Generate & Download Resume
-</button>
-    </div>
-
-    <!-- Output -->
-    <div id="output" class="mt-5 p-4 bg-white shadow mx-auto" style="max-width: 700px;"></div>
-
-</div>
-
-<!-- PDF Library -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeForge — AI-Powered Resume Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<!-- Your JS -->
-<script src="script.js"></script>
+</head>
+<body>
 
+<!-- ─── TOP BAR ─────────────────────────────── -->
+<header class="topbar">
+  <div class="logo-wrap">
+    <div class="logo-icon">📄</div>
+    <div class="logo-text">Resume<span>Forge</span></div>
+  </div>
+
+  <div class="topbar-center">
+    <button class="tpl-btn active" onclick="setTemplate('modern',this)">Modern</button>
+    <button class="tpl-btn" onclick="setTemplate('minimal',this)">Minimal</button>
+    <button class="tpl-btn" onclick="setTemplate('professional',this)">Professional</button>
+  </div>
+
+  <div class="topbar-right">
+    <div class="score-pill">
+      Resume score <span class="score-num" id="score-num">0%</span>
+    </div>
+    <button class="btn btn-ghost" onclick="exportPDF()">⬇ Export PDF</button>
+  </div>
+</header>
+
+<!-- ─── MAIN GRID ────────────────────────────── -->
+<div class="app-grid">
+
+  <!-- LEFT SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-group-label">Sections</div>
+
+    <div class="nav-item active" id="nav-basics" onclick="showPanel('basics',this)">
+      <div class="nav-icon">👤</div> Contact Info
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav-summary" onclick="showPanel('summary',this)">
+      <div class="nav-icon">✏️</div> Summary
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav-experience" onclick="showPanel('experience',this)">
+      <div class="nav-icon">💼</div> Experience
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav-education" onclick="showPanel('education',this)">
+      <div class="nav-icon">🎓</div> Education
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav-skills" onclick="showPanel('skills',this)">
+      <div class="nav-icon">⚡</div> Skills
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav-projects" onclick="showPanel('projects',this)">
+      <div class="nav-icon">🚀</div> Projects
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav-certifications" onclick="showPanel('certifications',this)">
+      <div class="nav-icon">🏅</div> Certifications
+      <span class="check">✓</span>
+    </div>
+
+    <div class="sb-sep"></div>
+    <div class="sb-group-label">Visibility</div>
+
+    <div class="section-toggle">
+      <span class="toggle-label">Show Projects</span>
+      <button class="toggle-switch on" id="tog-projects" onclick="toggleSection('projects',this)"></button>
+    </div>
+    <div class="section-toggle">
+      <span class="toggle-label">Show Certifications</span>
+      <button class="toggle-switch on" id="tog-certifications" onclick="toggleSection('certifications',this)"></button>
+    </div>
+    <div class="section-toggle">
+      <span class="toggle-label">Skill Bars</span>
+      <button class="toggle-switch on" id="tog-skillbars" onclick="toggleSkillBars(this)"></button>
+    </div>
+
+    <div class="sb-sep"></div>
+    <div class="sb-group-label">AI Settings</div>
+    <div style="padding: 0 6px">
+      <div class="field" style="margin-bottom:8px">
+        <label>OpenAI API Key <span style="color:var(--text3);font-size:9px;text-transform:none">(optional)</span></label>
+        <input type="password" id="openai-key" placeholder="sk-..." style="font-size:11px;padding:7px 10px">
+      </div>
+      <div class="api-note">Leave blank to use smart <a href="#">rule-based suggestions</a>. Add key for GPT-4 powered suggestions.</div>
+    </div>
+  </nav>
+
+  <!-- EDITOR -->
+  <div class="editor" id="editor">
+
+    <!-- BASICS -->
+    <div class="section-panel active" id="panel-basics">
+      <div class="panel-head">
+        <div class="panel-title">Contact Info</div>
+        <div class="panel-desc">Your name and details appear at the very top of your resume.</div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>First Name</label><input id="firstName" placeholder="Aanya" oninput="live()"></div>
+        <div class="field"><label>Last Name</label><input id="lastName" placeholder="Sharma" oninput="live()"></div>
+      </div>
+      <div class="field"><label>Job Title / Role</label><input id="jobTitle" placeholder="Full-Stack Developer" oninput="live()"></div>
+      <div class="row2">
+        <div class="field"><label>Email</label><input id="email" type="email" placeholder="aanya@example.com" oninput="live()"></div>
+        <div class="field"><label>Phone</label><input id="phone" placeholder="+91 98765 43210" oninput="live()"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Location</label><input id="location" placeholder="Bengaluru, India" oninput="live()"></div>
+        <div class="field"><label>LinkedIn</label><input id="linkedin" placeholder="linkedin.com/in/aanya" oninput="live()"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>GitHub</label><input id="github" placeholder="github.com/aanya" oninput="live()"></div>
+        <div class="field"><label>Portfolio / Website</label><input id="website" placeholder="aanya.dev" oninput="live()"></div>
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="section-panel" id="panel-summary">
+      <div class="panel-head">
+        <div class="panel-title">Professional Summary</div>
+        <div class="panel-desc">2–3 punchy sentences. Highlight your experience, key skills, and what makes you stand out.</div>
+      </div>
+      <div class="field">
+        <label>Summary</label>
+        <textarea id="summary" rows="5" placeholder="Passionate full-stack developer with 3+ years building scalable web applications. Proficient in React, Node.js and cloud infrastructure. Strong track record of delivering features on time in fast-paced startup environments." oninput="live()"></textarea>
+      </div>
+
+      <!-- AI Suggestion Box for Summary -->
+      <div class="ai-box">
+        <div class="ai-box-head">
+          <span class="ai-badge">✦ AI</span>
+          <span class="ai-box-title">Smart suggestions for your summary</span>
+        </div>
+        <div class="ai-input-row">
+          <input type="text" id="summary-ai-input" placeholder="Type your role or key skills (e.g. React developer, 3 years)">
+          <button class="btn btn-teal" onclick="suggestSummary()" style="white-space:nowrap;font-size:12px">Suggest</button>
+        </div>
+        <div class="ai-suggestions" id="summary-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- EXPERIENCE -->
+    <div class="section-panel" id="panel-experience">
+      <div class="panel-head">
+        <div class="panel-title">Work Experience</div>
+        <div class="panel-desc">Most recent first. Focus on impact — use numbers when you can.</div>
+      </div>
+      <div class="entries" id="exp-entries"></div>
+      <button class="add-entry" onclick="addExp()">＋ Add work experience</button>
+
+      <!-- AI bullet point helper -->
+      <div class="ai-box" style="margin-top:18px">
+        <div class="ai-box-head">
+          <span class="ai-badge">✦ AI</span>
+          <span class="ai-box-title">Auto-generate bullet points</span>
+        </div>
+        <div class="ai-input-row">
+          <input type="text" id="bullet-ai-input" placeholder="e.g. Built React dashboard, reduced load time">
+          <button class="btn btn-teal" onclick="suggestBullets()" style="white-space:nowrap;font-size:12px">Suggest</button>
+        </div>
+        <div class="ai-suggestions" id="bullet-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- EDUCATION -->
+    <div class="section-panel" id="panel-education">
+      <div class="panel-head">
+        <div class="panel-title">Education</div>
+        <div class="panel-desc">Degrees, courses, and academic highlights.</div>
+      </div>
+      <div class="entries" id="edu-entries"></div>
+      <button class="add-entry" onclick="addEdu()">＋ Add education</button>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="section-panel" id="panel-skills">
+      <div class="panel-head">
+        <div class="panel-title">Skills</div>
+        <div class="panel-desc">Add skill bars to visually show proficiency, or use plain tags.</div>
+      </div>
+
+      <div id="skill-bars-section">
+        <div class="sb-group-label" style="padding:0 0 8px">Skill Bars (with proficiency)</div>
+        <div class="skill-bar-wrap" id="skill-bar-list"></div>
+        <button class="add-entry" onclick="addSkillBar()" style="margin-bottom:18px">＋ Add skill with bar</button>
+      </div>
+
+      <div class="field">
+        <label>Additional Skills (comma separated)</label>
+        <textarea id="extraSkills" rows="2" placeholder="Git, Docker, Agile, REST APIs, MySQL" oninput="live()"></textarea>
+      </div>
+      <div class="field">
+        <label>Languages</label>
+        <input id="languages" placeholder="English (Fluent), Hindi (Native)" oninput="live()">
+      </div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="section-panel" id="panel-projects">
+      <div class="panel-head">
+        <div class="panel-title">Projects</div>
+        <div class="panel-desc">Personal, freelance, or open-source work that shows your abilities.</div>
+      </div>
+      <div class="entries" id="proj-entries"></div>
+      <button class="add-entry" onclick="addProj()">＋ Add project</button>
+
+      <!-- AI project description helper -->
+      <div class="ai-box" style="margin-top:18px">
+        <div class="ai-box-head">
+          <span class="ai-badge">✦ AI</span>
+          <span class="ai-box-title">Improve project descriptions</span>
+        </div>
+        <div class="ai-input-row">
+          <input type="text" id="proj-ai-input" placeholder="e.g. E-commerce app using React and Firebase">
+          <button class="btn btn-teal" onclick="suggestProject()" style="white-space:nowrap;font-size:12px">Suggest</button>
+        </div>
+        <div class="ai-suggestions" id="proj-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- CERTIFICATIONS -->
+    <div class="section-panel" id="panel-certifications">
+      <div class="panel-head">
+        <div class="panel-title">Certifications</div>
+        <div class="panel-desc">Professional certificates and online courses.</div>
+      </div>
+      <div class="entries" id="cert-entries"></div>
+      <button class="add-entry" onclick="addCert()">＋ Add certification</button>
+    </div>
+
+  </div><!-- /editor -->
+
+  <!-- PREVIEW PANE -->
+  <div class="preview-wrap" id="preview-wrap">
+    <div id="resume-paper" class="resume-paper tmpl-modern">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+
+</div><!-- /app-grid -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Export loading -->
+<div class="export-loading" id="export-loading">
+  <div class="export-loading-ring"></div>
+  <p>Generating your PDF…</p>
+</div>
+
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+/* ────────────────────────────────────────────
+   STATE
+──────────────────────────────────────────── */
+let currentTemplate = 'modern';
+let expCount = 0, eduCount = 0, projCount = 0, certCount = 0, sbCount = 0;
+let hiddenSections = new Set();
+let showSkillBars = true;
+
+/* ────────────────────────────────────────────
+   NAVIGATION
+──────────────────────────────────────────── */
+function showPanel(name, el) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+/* ────────────────────────────────────────────
+   HELPERS
+──────────────────────────────────────────── */
+function v(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; }
+function esc(s) { if (!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function live() { renderResume(); updateScore(); }
+
+/* ────────────────────────────────────────────
+   SECTION TOGGLE
+──────────────────────────────────────────── */
+function toggleSection(sec, btn) {
+  btn.classList.toggle('on');
+  if (btn.classList.contains('on')) {
+    hiddenSections.delete(sec);
+  } else {
+    hiddenSections.add(sec);
+  }
+  live();
+}
+
+function toggleSkillBars(btn) {
+  btn.classList.toggle('on');
+  showSkillBars = btn.classList.contains('on');
+  live();
+}
+
+/* ────────────────────────────────────────────
+   SKILL BARS
+──────────────────────────────────────────── */
+function addSkillBar(name='', level=70) {
+  const id = 'sb' + (++sbCount);
+  const wrap = document.getElementById('skill-bar-list');
+  const row = document.createElement('div');
+  row.className = 'skill-bar-item';
+  row.id = 'sbrow-' + id;
+  row.innerHTML = `
+    <input type="text" id="${id}-name" placeholder="JavaScript" value="${esc(name)}" oninput="live()">
+    <span class="skill-level-label" id="${id}-label">${getLevelLabel(level)}</span>
+    <input type="range" class="skill-range" id="${id}-range" min="10" max="100" value="${level}"
+      style="--val:${level}%"
+      oninput="updateSkillBar('${id}',this)">
+    <button class="ic-btn del" onclick="document.getElementById('sbrow-${id}').remove();live();" style="margin-left:-100px">✕</button>`;
+  wrap.appendChild(row);
+  live();
+}
+
+function updateSkillBar(id, input) {
+  input.style.setProperty('--val', input.value + '%');
+  const lbl = document.getElementById(id + '-label');
+  if (lbl) lbl.textContent = getLevelLabel(parseInt(input.value));
+  live();
+}
+
+function getLevelLabel(v) {
+  if (v >= 90) return 'Expert';
+  if (v >= 75) return 'Advanced';
+  if (v >= 55) return 'Proficient';
+  if (v >= 35) return 'Intermediate';
+  return 'Beginner';
+}
+
+function getSkillBars() {
+  const bars = [];
+  document.querySelectorAll('[id^="sbrow-"]').forEach(row => {
+    const id = row.id.replace('sbrow-', '');
+    const name = v(id + '-name');
+    const rangeEl = document.getElementById(id + '-range');
+    if (name && rangeEl) bars.push({ name, level: parseInt(rangeEl.value) });
+  });
+  return bars;
+}
+
+/* ────────────────────────────────────────────
+   ENTRY BUILDERS
+──────────────────────────────────────────── */
+function makeCard(type, id, innerHtml, titleFn) {
+  const card = document.createElement('div');
+  card.className = 'entry-card';
+  card.dataset.type = type;
+  card.dataset.id = id;
+  card.innerHTML = `
+    <div class="ec-head" onclick="toggleCard(this)">
+      <span class="ec-drag">⠿</span>
+      <div class="ec-info">
+        <div class="ec-title" id="${id}-etitle">New entry</div>
+        <div class="ec-sub" id="${id}-esub">Click to expand</div>
+      </div>
+      <div class="ec-actions">
+        <button class="ic-btn del" title="Delete" onclick="event.stopPropagation();this.closest('.entry-card').remove();live();">✕</button>
+        <button class="ic-btn" title="Toggle">▾</button>
+      </div>
+    </div>
+    <div class="ec-body open">${innerHtml}</div>`;
+
+  card.querySelectorAll('input,textarea').forEach(el => {
+    el.addEventListener('input', () => { titleFn(id); live(); });
+  });
+  return card;
+}
+
+function toggleCard(head) {
+  head.nextElementSibling.classList.toggle('open');
+}
+
+/* Experience */
+function addExp(role='', company='', start='', end='', loc='', desc='') {
+  const id = 'exp' + (++expCount);
+  const inner = `
+    <div class="row2">
+      <div class="field"><label>Job Title</label><input id="${id}-role" value="${esc(role)}" placeholder="Frontend Developer"></div>
+      <div class="field"><label>Company</label><input id="${id}-company" value="${esc(company)}" placeholder="Google"></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>Start</label><input id="${id}-start" value="${esc(start)}" placeholder="Jun 2022"></div>
+      <div class="field"><label>End</label><input id="${id}-end" value="${esc(end)}" placeholder="Present"></div>
+      <div class="field"><label>Location</label><input id="${id}-loc" value="${esc(loc)}" placeholder="Remote"></div>
+    </div>
+    <div class="field">
+      <label>Responsibilities / Achievements</label>
+      <textarea id="${id}-desc" rows="4" placeholder="• Built React dashboard reducing page load by 40%&#10;• Led team of 3 engineers to deliver features 2 weeks ahead of schedule">${esc(desc)}</textarea>
+    </div>`;
+  const card = makeCard('exp', id, inner, id => {
+    const t = document.getElementById(id+'-etitle');
+    const s = document.getElementById(id+'-esub');
+    if (t) t.textContent = v(id+'-role') || 'New position';
+    if (s) s.textContent = v(id+'-company') || 'Company';
+  });
+  document.getElementById('exp-entries').appendChild(card);
+  live();
+}
+
+/* Education */
+function addEdu(degree='', school='', year='', grade='') {
+  const id = 'edu' + (++eduCount);
+  const inner = `
+    <div class="row2">
+      <div class="field"><label>Degree / Course</label><input id="${id}-degree" value="${esc(degree)}" placeholder="B.Tech Computer Science"></div>
+      <div class="field"><label>Institution</label><input id="${id}-school" value="${esc(school)}" placeholder="IIT Bombay"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Duration / Year</label><input id="${id}-year" value="${esc(year)}" placeholder="2018 – 2022"></div>
+      <div class="field"><label>GPA / Grade</label><input id="${id}-grade" value="${esc(grade)}" placeholder="9.1/10 | First Class"></div>
+    </div>`;
+  const card = makeCard('edu', id, inner, id => {
+    const t = document.getElementById(id+'-etitle');
+    const s = document.getElementById(id+'-esub');
+    if (t) t.textContent = v(id+'-degree') || 'Degree';
+    if (s) s.textContent = v(id+'-school') || 'Institution';
+  });
+  document.getElementById('edu-entries').appendChild(card);
+  live();
+}
+
+/* Projects */
+function addProj(name='', tech='', link='', desc='') {
+  const id = 'proj' + (++projCount);
+  const inner = `
+    <div class="row2">
+      <div class="field"><label>Project Name</label><input id="${id}-name" value="${esc(name)}" placeholder="AI Resume Builder"></div>
+      <div class="field"><label>Tech Stack</label><input id="${id}-tech" value="${esc(tech)}" placeholder="React, Node.js, MongoDB"></div>
+    </div>
+    <div class="field"><label>GitHub / Live URL</label><input id="${id}-link" value="${esc(link)}" placeholder="github.com/you/project"></div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="${id}-desc" rows="3" placeholder="Developed a full-stack AI-powered resume builder with live preview and PDF export. Used by 200+ beta users.">${esc(desc)}</textarea>
+    </div>`;
+  const card = makeCard('proj', id, inner, id => {
+    const t = document.getElementById(id+'-etitle');
+    const s = document.getElementById(id+'-esub');
+    if (t) t.textContent = v(id+'-name') || 'New project';
+    if (s) s.textContent = v(id+'-tech') || 'Tech stack';
+  });
+  document.getElementById('proj-entries').appendChild(card);
+  live();
+}
+
+/* Certifications */
+function addCert(name='', org='', year='') {
+  const id = 'cert' + (++certCount);
+  const inner = `
+    <div class="row2">
+      <div class="field"><label>Certification Name</label><input id="${id}-name" value="${esc(name)}" placeholder="AWS Solutions Architect"></div>
+      <div class="field"><label>Issuer</label><input id="${id}-org" value="${esc(org)}" placeholder="Amazon Web Services"></div>
+    </div>
+    <div class="field"><label>Year</label><input id="${id}-year" value="${esc(year)}" placeholder="2024"></div>`;
+  const card = makeCard('cert', id, inner, id => {
+    const t = document.getElementById(id+'-etitle');
+    const s = document.getElementById(id+'-esub');
+    if (t) t.textContent = v(id+'-name') || 'Certification';
+    if (s) s.textContent = v(id+'-org') || 'Issuer';
+  });
+  document.getElementById('cert-entries').appendChild(card);
+  live();
+}
+
+/* ────────────────────────────────────────────
+   RESUME RENDERER
+──────────────────────────────────────────── */
+function renderResume() {
+  const paper = document.getElementById('resume-paper');
+  paper.className = 'resume-paper tmpl-' + currentTemplate;
+
+  if (currentTemplate === 'professional') {
+    renderProfessional(paper);
+  } else if (currentTemplate === 'minimal') {
+    renderMinimal(paper);
+  } else {
+    renderModern(paper);
+  }
+}
+
+/* ── Contact data helpers ── */
+function getContactsHtml(separator='', iconStyle='') {
+  const parts = [];
+  if (v('email'))    parts.push(`<span>✉ ${esc(v('email'))}</span>`);
+  if (v('phone'))    parts.push(`<span>📞 ${esc(v('phone'))}</span>`);
+  if (v('location')) parts.push(`<span>📍 ${esc(v('location'))}</span>`);
+  if (v('linkedin')) parts.push(`<span>in ${esc(v('linkedin'))}</span>`);
+  if (v('github'))   parts.push(`<span>⌥ ${esc(v('github'))}</span>`);
+  if (v('website'))  parts.push(`<span>🌐 ${esc(v('website'))}</span>`);
+  return parts.join(separator);
+}
+
+function getExpHtml(cls) {
+  const cards = document.querySelectorAll('[data-type="exp"]');
+  if (!cards.length) return '';
+  let h = `<div class="r-section">
+    <div class="r-sec-head"><span class="r-sec-title">Experience</span><span class="r-sec-line"></span></div>`;
+  cards.forEach(card => {
+    const id = card.dataset.id;
+    const role = v(id+'-role'), company = v(id+'-company');
+    if (!role && !company) return;
+    h += `<div class="r-entry">
+      <div class="r-row"><span class="r-role">${esc(role)}</span><span class="r-date">${esc(v(id+'-start'))}${v(id+'-start')||v(id+'-end')?' – ':''}${esc(v(id+'-end'))}</span></div>`;
+    if (company) h += `<div class="r-org">${esc(company)}${v(id+'-loc')?' · '+esc(v(id+'-loc')):''}</div>`;
+    if (v(id+'-desc')) h += `<div class="r-desc">${esc(v(id+'-desc'))}</div>`;
+    h += '</div>';
+  });
+  return h + '</div>';
+}
+
+function getEduHtml() {
+  const cards = document.querySelectorAll('[data-type="edu"]');
+  if (!cards.length) return '';
+  let h = `<div class="r-section">
+    <div class="r-sec-head"><span class="r-sec-title">Education</span><span class="r-sec-line"></span></div>`;
+  cards.forEach(card => {
+    const id = card.dataset.id;
+    const degree = v(id+'-degree'), school = v(id+'-school');
+    if (!degree && !school) return;
+    h += `<div class="r-entry">
+      <div class="r-row"><span class="r-role">${esc(degree)}</span><span class="r-date">${esc(v(id+'-year'))}</span></div>`;
+    if (school) h += `<div class="r-org">${esc(school)}${v(id+'-grade')?' · '+esc(v(id+'-grade')):''}</div>`;
+    h += '</div>';
+  });
+  return h + '</div>';
+}
+
+function getProjHtml() {
+  if (hiddenSections.has('projects')) return '';
+  const cards = document.querySelectorAll('[data-type="proj"]');
+  if (!cards.length) return '';
+  let h = `<div class="r-section">
+    <div class="r-sec-head"><span class="r-sec-title">Projects</span><span class="r-sec-line"></span></div>`;
+  cards.forEach(card => {
+    const id = card.dataset.id;
+    const name = v(id+'-name');
+    if (!name) return;
+    h += `<div class="r-entry">
+      <div class="r-row"><span class="r-role">${esc(name)}</span>${v(id+'-link')?`<span class="r-date">${esc(v(id+'-link'))}</span>`:''}</div>`;
+    if (v(id+'-tech')) h += `<div class="r-org">${esc(v(id+'-tech'))}</div>`;
+    if (v(id+'-desc')) h += `<div class="r-desc">${esc(v(id+'-desc'))}</div>`;
+    h += '</div>';
+  });
+  return h + '</div>';
+}
+
+function getCertHtml() {
+  if (hiddenSections.has('certifications')) return '';
+  const cards = document.querySelectorAll('[data-type="cert"]');
+  if (!cards.length) return '';
+  let h = `<div class="r-section">
+    <div class="r-sec-head"><span class="r-sec-title">Certifications</span><span class="r-sec-line"></span></div>`;
+  cards.forEach(card => {
+    const id = card.dataset.id;
+    const name = v(id+'-name');
+    if (!name) return;
+    h += `<div class="r-entry">
+      <div class="r-row"><span class="r-role">${esc(name)}</span><span class="r-date">${esc(v(id+'-year'))}</span></div>`;
+    if (v(id+'-org')) h += `<div class="r-org">${esc(v(id+'-org'))}</div>`;
+    h += '</div>';
+  });
+  return h + '</div>';
+}
+
+function getSkillsMainHtml() {
+  const bars = getSkillBars();
+  const extra = v('extraSkills').split(',').map(s=>s.trim()).filter(Boolean);
+  const langs = v('languages');
+  let h = '';
+
+  if (showSkillBars && bars.length) {
+    h += `<div class="r-section">
+      <div class="r-sec-head"><span class="r-sec-title">Skills</span><span class="r-sec-line"></span></div>`;
+    bars.forEach(b => {
+      h += `<div class="r-skill-bar-row">
+        <span class="r-skill-bar-name">${esc(b.name)}</span>
+        <div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div>
+      </div>`;
+    });
+    h += '</div>';
+  }
+
+  if (extra.length) {
+    h += `<div class="r-section">
+      ${!showSkillBars || !bars.length ? '<div class="r-sec-head"><span class="r-sec-title">Skills</span><span class="r-sec-line"></span></div>' : ''}
+      <div class="r-skill-tags">${extra.map(s=>`<span class="r-skill-tag">${esc(s)}</span>`).join('')}</div>
+    </div>`;
+  }
+
+  if (langs) {
+    h += `<div class="r-section">
+      <div class="r-sec-head"><span class="r-sec-title">Languages</span><span class="r-sec-line"></span></div>
+      <div class="r-summary-text">${esc(langs)}</div>
+    </div>`;
+  }
+
+  return h;
+}
+
+/* ── Template: Modern ── */
+function renderModern(paper) {
+  const name = [v('firstName'), v('lastName')].filter(Boolean).join(' ') || 'Your Name';
+  let html = `<div class="r-accent-bar"></div><div class="r-body">
+    <div class="r-header">
+      <div class="r-name">${esc(name)}</div>
+      ${v('jobTitle') ? `<div class="r-jobtitle">${esc(v('jobTitle'))}</div>` : ''}
+      <div class="r-contacts">${getContactsHtml()}</div>
+    </div>`;
+  if (v('summary')) html += `<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Summary</span><span class="r-sec-line"></span></div><div class="r-summary-text">${esc(v('summary'))}</div></div>`;
+  html += getExpHtml();
+  html += getEduHtml();
+  html += getProjHtml();
+  html += getCertHtml();
+  html += getSkillsMainHtml();
+  html += '</div>';
+  paper.innerHTML = html;
+}
+
+/* ── Template: Minimal ── */
+function renderMinimal(paper) {
+  const name = [v('firstName'), v('lastName')].filter(Boolean).join(' ') || 'Your Name';
+  let html = `<div class="r-body">
+    <div class="r-name">${esc(name)}</div>
+    ${v('jobTitle') ? `<div class="r-jobtitle">${esc(v('jobTitle'))}</div>` : ''}
+    <div class="r-contacts">${getContactsHtml()}</div>`;
+  if (v('summary')) html += `<div class="r-section"><div class="r-sec-title">About</div><div class="r-summary-text">${esc(v('summary'))}</div></div>`;
+  html += getExpHtml();
+  html += getEduHtml();
+  html += getProjHtml();
+  html += getCertHtml();
+  html += getSkillsMainHtml();
+  html += '</div>';
+  paper.innerHTML = html;
+}
+
+/* ── Template: Professional ── */
+function renderProfessional(paper) {
+  const name = [v('firstName'), v('lastName')].filter(Boolean).join(' ') || 'Your Name';
+  const bars = getSkillBars();
+  const extra = v('extraSkills').split(',').map(s=>s.trim()).filter(Boolean);
+
+  let sidebar = `
+    <div class="r-sidebar">
+      <div class="r-name">${esc(name)}</div>
+      ${v('jobTitle') ? `<div class="r-jobtitle">${esc(v('jobTitle'))}</div>` : ''}
+      <div class="r-contacts">${getContactsHtml('<br>')}</div>`;
+
+  if (v('summary')) sidebar += `<div class="r-sidebar-sec-title">About</div><div class="r-sidebar-text">${esc(v('summary'))}</div>`;
+
+  if (showSkillBars && bars.length) {
+    sidebar += `<div class="r-sidebar-sec-title">Skills</div>`;
+    bars.forEach(b => {
+      sidebar += `<div class="r-skill-bar-row">
+        <span class="r-skill-bar-name">${esc(b.name)}</span>
+        <div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div>
+      </div>`;
+    });
+  }
+  if (extra.length) {
+    sidebar += `<div class="r-sidebar-sec-title">Tools</div><div class="r-skill-tags">${extra.map(s=>`<span class="r-skill-tag">${esc(s)}</span>`).join('')}</div>`;
+  }
+  if (v('languages')) sidebar += `<div class="r-sidebar-sec-title">Languages</div><div class="r-sidebar-text">${esc(v('languages'))}</div>`;
+  sidebar += '</div>';
+
+  // Main column (no skill section header override for professional)
+  let main = `<div class="r-main">`;
+  main += getExpHtml();
+  main += getEduHtml();
+  main += getProjHtml();
+  main += getCertHtml();
+  main += '</div>';
+
+  paper.innerHTML = sidebar + main;
+}
+
+/* ────────────────────────────────────────────
+   TEMPLATES
+──────────────────────────────────────────── */
+function setTemplate(name, btn) {
+  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  currentTemplate = name;
+  live();
+  showToast('Template switched to ' + name.charAt(0).toUpperCase() + name.slice(1));
+}
+
+/* ────────────────────────────────────────────
+   SCORE
+──────────────────────────────────────────── */
+function updateScore() {
+  const checks = [
+    v('firstName'), v('email'), v('jobTitle'), v('phone'),
+    v('summary').length > 30,
+    document.querySelectorAll('[data-type="exp"]').length > 0,
+    document.querySelectorAll('[data-type="edu"]').length > 0,
+    (v('extraSkills') || getSkillBars().length > 0),
+  ];
+  const score = Math.round(checks.filter(Boolean).length / checks.length * 100);
+  document.getElementById('score-num').textContent = score + '%';
+
+  // Update nav done states
+  const navChecks = {
+    basics: v('firstName') && v('email'),
+    summary: v('summary').length > 20,
+    experience: document.querySelectorAll('[data-type="exp"]').length > 0,
+    education: document.querySelectorAll('[data-type="edu"]').length > 0,
+    skills: !!(v('extraSkills') || getSkillBars().length),
+    projects: document.querySelectorAll('[data-type="proj"]').length > 0,
+    certifications: document.querySelectorAll('[data-type="cert"]').length > 0,
+  };
+  Object.entries(navChecks).forEach(([sec, done]) => {
+    const nav = document.getElementById('nav-' + sec);
+    if (nav) nav.classList.toggle('done', !!done);
+  });
+}
+
+/* ────────────────────────────────────────────
+   PDF EXPORT (html2pdf.js)
+──────────────────────────────────────────── */
+function exportPDF() {
+  const loading = document.getElementById('export-loading');
+  loading.classList.add('show');
+
+  // Clone the paper element, apply inline styles for PDF
+  const paper = document.getElementById('resume-paper').cloneNode(true);
+  paper.style.boxShadow = 'none';
+  paper.style.maxWidth = '100%';
+  paper.style.width = '210mm';
+
+  const opt = {
+    margin: 0,
+    filename: (v('firstName') || 'resume') + '_resume.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+
+  // Temporarily place clone in body
+  paper.style.position = 'absolute';
+  paper.style.left = '-9999px';
+  paper.style.top = '0';
+  document.body.appendChild(paper);
+
+  html2pdf().set(opt).from(paper).save().then(() => {
+    document.body.removeChild(paper);
+    loading.classList.remove('show');
+    showToast('PDF downloaded!', 'success');
+  }).catch(() => {
+    document.body.removeChild(paper);
+    loading.classList.remove('show');
+    showToast('Export failed. Try again.', 'error');
+  });
+}
+
+/* ────────────────────────────────────────────
+   AI SUGGESTION ENGINE
+   - Rule-based (always works)
+   - OpenAI API (if key provided)
+──────────────────────────────────────────── */
+
+/* Rule-based suggestion banks */
+const SUMMARY_TEMPLATES = [
+  (role, skills) => `Results-driven ${role || 'professional'} with hands-on experience building scalable solutions. Proficient in ${skills || 'modern technologies'} with a strong focus on clean code and performance optimization. Adept at collaborating in agile teams to ship impactful features.`,
+  (role, skills) => `Passionate ${role || 'developer'} skilled in ${skills || 'full-stack development'}, delivering end-to-end solutions from ideation to deployment. Known for strong problem-solving ability and a commitment to writing maintainable, well-documented code. Excited to contribute to high-impact products.`,
+  (role, skills) => `Detail-oriented ${role || 'engineer'} with expertise in ${skills || 'web technologies'} and a track record of improving system performance and developer productivity. Comfortable leading technical discussions, mentoring peers, and taking ownership of complex features in fast-paced environments.`
+];
+
+const BULLET_TEMPLATES = [
+  input => `• Developed and deployed ${input}, reducing manual effort by 35% and improving team productivity`,
+  input => `• Designed and implemented ${input}, resulting in a 25% improvement in application performance and scalability`,
+  input => `• Collaborated with cross-functional teams to deliver ${input} on time, receiving positive feedback from stakeholders`,
+  input => `• Architected ${input} using industry best practices, enabling seamless integration with existing systems`,
+  input => `• Optimized ${input}, cutting processing time by 40% through caching and algorithmic improvements`,
+];
+
+const PROJECT_TEMPLATES = [
+  input => `Engineered ${input} from scratch using modern web technologies. Implemented user authentication, real-time data sync, and a responsive UI. Deployed on cloud infrastructure and used by 100+ users.`,
+  input => `Built ${input} as a full-stack application with clean architecture and RESTful API design. Features include dynamic filtering, search, and offline support. Open-sourced with 50+ GitHub stars.`,
+  input => `Developed ${input} solving a real-world problem for end users. Designed the entire product lifecycle — wireframing, development, testing, and deployment — within 48 hours during a hackathon. Won 2nd place.`,
+];
+
+function renderSuggestions(containerId, suggestions, onUse) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
+  box.innerHTML = suggestions.map((text, i) => `
+    <div class="ai-suggestion" onclick="useSuggestion('${containerId}', ${i})">
+      <span style="flex:1">${esc(text)}</span>
+      <span class="use-btn">USE ↗</span>
+    </div>`).join('');
+  box._suggestions = suggestions;
+  box._onUse = onUse;
+}
+
+function useSuggestion(containerId, idx) {
+  const box = document.getElementById(containerId);
+  if (!box || !box._suggestions) return;
+  if (box._onUse) box._onUse(box._suggestions[idx]);
+}
+
+async function suggestSummary() {
+  const input = v('summary-ai-input') || `${v('jobTitle')} with skills in ${v('extraSkills')}`;
+  const role = v('jobTitle') || input;
+  const skills = v('extraSkills') || input;
+  const key = v('openai-key');
+
+  if (key) {
+    await openAISuggest('summary', input, key);
+    return;
+  }
+
+  // Rule-based
+  const suggestions = SUMMARY_TEMPLATES.slice(0, 2).map(fn => fn(role, skills));
+  renderSuggestions('summary-suggestions', suggestions, text => {
+    document.getElementById('summary').value = text;
+    live();
+    showToast('Summary applied!', 'success');
+  });
+}
+
+async function suggestBullets() {
+  const input = v('bullet-ai-input');
+  if (!input) { showToast('Enter a brief description first.'); return; }
+  const key = v('openai-key');
+
+  if (key) {
+    await openAISuggest('bullets', input, key);
+    return;
+  }
+
+  const suggestions = BULLET_TEMPLATES.slice(0, 2).map(fn => fn(input));
+  renderSuggestions('bullet-suggestions', suggestions, text => {
+    // Append to the last open experience textarea
+    const textareas = document.querySelectorAll('[id$="-desc"][id*="exp"]');
+    if (textareas.length) {
+      const last = textareas[textareas.length - 1];
+      last.value = (last.value ? last.value + '\n' : '') + text;
+      live();
+      showToast('Bullet point added!', 'success');
+    } else {
+      showToast('Add an experience entry first.');
+    }
+  });
+}
+
+async function suggestProject() {
+  const input = v('proj-ai-input');
+  if (!input) { showToast('Enter a project description first.'); return; }
+  const key = v('openai-key');
+
+  if (key) {
+    await openAISuggest('project', input, key);
+    return;
+  }
+
+  const suggestions = PROJECT_TEMPLATES.slice(0, 2).map(fn => fn(input));
+  renderSuggestions('proj-suggestions', suggestions, text => {
+    const textareas = document.querySelectorAll('[id$="-desc"][id*="proj"]');
+    if (textareas.length) {
+      textareas[textareas.length - 1].value = text;
+      live();
+      showToast('Description applied!', 'success');
+    } else {
+      showToast('Add a project entry first.');
+    }
+  });
+}
+
+/* OpenAI API integration */
+async function openAISuggest(type, input, key) {
+  const prompts = {
+    summary: `Generate 2 concise, impactful resume professional summaries for a "${input}". Each should be 2-3 sentences. Return only a JSON array of 2 strings, nothing else.`,
+    bullets: `Generate 2 strong resume bullet points for this work experience: "${input}". Start with action verbs, include metrics where possible. Return only a JSON array of 2 strings, nothing else.`,
+    project: `Generate 2 compelling resume project descriptions (2-3 sentences each) for: "${input}". Focus on technologies used and impact. Return only a JSON array of 2 strings, nothing else.`
+  };
+  const containerId = type === 'summary' ? 'summary-suggestions' : type === 'bullets' ? 'bullet-suggestions' : 'proj-suggestions';
+  const box = document.getElementById(containerId);
+  if (box) box.innerHTML = `<div style="text-align:center;padding:12px;color:var(--text3);font-size:12px"><span class="ai-spinner"></span> Generating with GPT-4…</div>`;
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompts[type] }],
+        max_tokens: 400
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = data.choices[0].message.content.trim();
+    const suggestions = JSON.parse(text);
+
+    if (type === 'summary') {
+      renderSuggestions(containerId, suggestions, t => { document.getElementById('summary').value = t; live(); showToast('Summary applied!', 'success'); });
+    } else if (type === 'bullets') {
+      renderSuggestions(containerId, suggestions, t => {
+        const textareas = document.querySelectorAll('[id$="-desc"][id*="exp"]');
+        if (textareas.length) { textareas[textareas.length-1].value = (textareas[textareas.length-1].value ? textareas[textareas.length-1].value+'\n':'')+t; live(); showToast('Added!','success'); }
+      });
+    } else {
+      renderSuggestions(containerId, suggestions, t => {
+        const textareas = document.querySelectorAll('[id$="-desc"][id*="proj"]');
+        if (textareas.length) { textareas[textareas.length-1].value = t; live(); showToast('Applied!','success'); }
+      });
+    }
+  } catch (e) {
+    if (box) box.innerHTML = `<div style="color:var(--red);font-size:12px;padding:10px">API Error: ${esc(e.message)}</div>`;
+  }
+}
+
+/* ────────────────────────────────────────────
+   TOAST
+──────────────────────────────────────────── */
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); }, 2800);
+}
+
+/* ────────────────────────────────────────────
+   INIT
+──────────────────────────────────────────── */
+live();
+</script>
 </body>
 </html>

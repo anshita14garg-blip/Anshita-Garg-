@@ -726,43 +726,69 @@ function completeBreathSession() {
 }
 
 // ============================================================
-// CHATBOT
+// CHATBOT (UPDATED & IMPROVED)
 // ============================================================
+
 const BOT_NAME = 'WellBot';
 
-/** Rule-based response map */
+/** Rule-based response map (IMPROVED 🔥) */
 const CHAT_RULES = [
-  { pattern: /hello|hi|hey/i,           reply: "Hey there! 👋 I'm WellBot, your wellness companion. How are you feeling today?" },
-  { pattern: /sleep|tired|exhausted/i,  reply: "Sleep is crucial for students! 😴 Are you getting 7–9 hours? Try a consistent bedtime and avoid screens before sleeping. Use the Sleep Tracker to monitor your rest." },
-  { pattern: /stress|anxious|anxiety/i, reply: "Stress is normal, but manageable! 🧘 Try the Breathing Exercise — 4-7-8 technique is clinically proven to reduce anxiety. Also consider journaling your thoughts." },
-  { pattern: /sad|depress|unhappy/i,    reply: "I hear you. 💜 Feeling sad is okay. Small steps help: a short walk, talking to a friend, or 5 minutes of deep breathing. Would you like some relaxation tips?" },
-  { pattern: /water|hydrat/i,           reply: "💧 Great question! Aim for 8 glasses/day. Dehydration reduces focus by up to 20%. Check your Water Tracker — how many glasses today?" },
-  { pattern: /mood/i,                   reply: "Your mood affects everything from focus to immune function. 😊 Log it daily in the Mood Tracker to spot patterns. What mood are you feeling right now?" },
-  { pattern: /exercise|workout|gym/i,   reply: "Exercise boosts serotonin and dopamine! 💪 Even 20–30 minutes of walking daily has major health benefits. No gym needed." },
-  { pattern: /food|eat|diet|nutrition/i,reply: "Eat like a student champion! 🥗 Prioritize: proteins (eggs, lentils), complex carbs (oats, brown rice), and omega-3s (nuts, fish) for brain fuel." },
-  { pattern: /focus|study|concentrate/i,reply: "Try the Pomodoro technique: 25 min study + 5 min break. 📚 Also ensure 7+ hours of sleep — it's when your brain consolidates memory!" },
-  { pattern: /score|health score/i,     reply: `Your current health score is ${state.score}/100. 📊 It's calculated from mood (40%), sleep (35%), and water (25%). Log all three for an accurate score!` },
-  { pattern: /breath|breathe|calm/i,    reply: "Let's breathe! 🌬️ Head to the Breathing tab for a guided 4-7-8 exercise. It activates your parasympathetic nervous system in under 2 minutes." },
-  { pattern: /thank/i,                  reply: "You're welcome! 😊 Remember: small consistent habits create big health changes. You've got this!" },
-  { pattern: /help|what can you do/i,   reply: "I can help with: 💡 sleep tips, mood support, hydration reminders, stress management, study focus, and general wellness advice. Just ask anything!" },
+  { pattern: /hello|hi|hey/i, reply: "Hey there! 👋 I'm WellBot, your wellness companion. How are you feeling today?" },
+
+  { pattern: /done|completed|finished/i, reply: "Great job! 🌿 You're taking steps toward better health. Keep going 💜" },
+
+  { pattern: /not good|bad day|feeling low/i, reply: "I'm here for you 💜 Try a breathing exercise 🌬️ or take a short break. Things will get better." },
+
+  { pattern: /sleep|tired|exhausted/i, reply: "Sleep is crucial! 😴 Aim for 7–9 hours and avoid screens before bed." },
+
+  { pattern: /stress|anxious|anxiety/i, reply: "Feeling stressed? 🧘 Try the breathing exercise or take a short walk." },
+
+  { pattern: /sad|depress|unhappy/i, reply: "I hear you 💜 Try talking to someone or doing something you enjoy." },
+
+  { pattern: /water|hydrat/i, reply: "💧 Stay hydrated! Aim for 7–8 glasses daily." },
+
+  { pattern: /mood/i, reply: "Track your mood daily 😊 It helps understand your mental patterns." },
+
+  { pattern: /exercise|workout|gym/i, reply: "Even 20–30 minutes of activity daily boosts your health 💪" },
+
+  { pattern: /food|eat|diet|nutrition/i, reply: "Eat balanced meals 🍎 Include proteins, fruits, and healthy carbs." },
+
+  { pattern: /focus|study|concentrate/i, reply: "Try Pomodoro: 25 min focus + 5 min break 📚 It works great!" },
+
+  { pattern: /score|health/i, reply: () => `Your current health score is ${state.score}/100 📊 Keep tracking to improve!` },
+
+  { pattern: /breath|breathe|calm/i, reply: "Go to the Breathing tab 🌬️ and follow the guided exercise." },
+
+  { pattern: /thank/i, reply: "You're welcome 😊 Keep taking care of yourself!" },
+
+  { pattern: /help/i, reply: "I can help with sleep, stress, hydration, mood, and wellness tips 🌿 Just ask!" },
 ];
 
+/** Initialize chat */
 function initChat() {
   const messages = document.getElementById('chatMessages');
   if (!messages) return;
+
   messages.innerHTML = '';
-  addBotMessage("👋 Hey! I'm **WellBot**, your AI wellness companion. Ask me about sleep, stress, mood, hydration, or just say hi!");
+
+  addBotMessage("👋 Hi! I'm **WellBot** 🌿 — your WellNest companion. Ask me anything about health, sleep, stress, or habits!");
 }
 
+/** Add bot message */
 function addBotMessage(text) {
   const div = document.createElement('div');
   div.className = 'chat-msg bot';
-  // Simple markdown: **bold**
+
+  if (typeof text === "function") {
+    text = text();
+  }
+
   div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   document.getElementById('chatMessages').appendChild(div);
   scrollChat();
 }
 
+/** Add user message */
 function addUserMessage(text) {
   const div = document.createElement('div');
   div.className = 'chat-msg user';
@@ -771,65 +797,50 @@ function addUserMessage(text) {
   scrollChat();
 }
 
+/** Scroll chat */
 function scrollChat() {
   const msgs = document.getElementById('chatMessages');
-  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
-async function sendChat() {
+/** Send chat */
+function sendChat() {
   const input = document.getElementById('chatInput');
-  const text  = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  addUserMessage(text);
+  const text = input.value.trim();
 
-  // Small delay for natural feel
-  setTimeout(async () => {
-    const reply = await getBotReply(text);
+  if (!text) return;
+
+  addUserMessage(text);
+  input.value = '';
+
+  setTimeout(() => {
+    const reply = getBotReply(text);
     addBotMessage(reply);
-  }, 600);
+  }, 500);
 }
 
-async function getBotReply(text) {
-  // 1. Try OpenAI if key is set
-  if (OPENAI_KEY && OPENAI_KEY.startsWith('sk-')) {
-    try {
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          max_tokens: 150,
-          messages: [
-            { role: 'system', content: 'You are WellBot, a friendly student health companion. Give concise, practical wellness advice. Keep responses under 3 sentences. Focus on mental health, sleep, hydration, and stress management.' },
-            { role: 'user',   content: text }
-          ]
-        })
-      });
-      const data = await res.json();
-      return data.choices?.[0]?.message?.content || ruleBasedReply(text);
-    } catch(e) {
-      console.warn('OpenAI error, falling back to rule-based', e);
+/** Get bot reply */
+function getBotReply(text) {
+  for (const rule of CHAT_RULES) {
+    if (rule.pattern.test(text)) {
+      return typeof rule.reply === "function" ? rule.reply() : rule.reply;
     }
   }
 
-  // 2. Rule-based fallback
-  return ruleBasedReply(text);
-}
-
-function ruleBasedReply(text) {
-  for (const rule of CHAT_RULES) {
-    if (rule.pattern.test(text)) return rule.reply;
-  }
-  // Context-aware default
+  // 🔥 Smart fallback (no more boring reply)
   if (state.score < 50) {
-    return `I notice your health score is ${state.score}/100. Focus on improving sleep, drinking more water, and managing mood. You can do it! 💪`;
+    return `Your health score is ${state.score}/100 📊 Try improving sleep, hydration, and mood habits 💪`;
   }
-  return "That's a great question! 🌿 For personalized guidance, make sure you've logged your mood, sleep, and water today. Your WellNest data helps me give better advice!";
+
+  const randomReplies = [
+    "I'm WellBot 🌿 — try asking about sleep, stress, or hydration!",
+    "Tell me more! I can help you improve your daily habits 😊",
+    "Ask me about wellness tips, mood, or health tracking 💜"
+  ];
+
+  return randomReplies[Math.floor(Math.random() * randomReplies.length)];
 }
+     
 
 // ============================================================
 // BROWSER NOTIFICATIONS

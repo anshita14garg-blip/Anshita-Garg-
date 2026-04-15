@@ -382,6 +382,227 @@ textarea{min-height:80px;line-height:1.65}
 </div>
 
 <script>
+
+  /* ── LOCAL STORAGE ── */
+const STORAGE_KEY = 'resumeforge_data';
+
+function saveToLocalStorage() {
+  try {
+    const state = {
+      // Basics
+      firstName: v('firstName'),
+      lastName: v('lastName'),
+      jobTitle: v('jobTitle'),
+      email: v('email'),
+      phone: v('phone'),
+      location: v('location'),
+      linkedin: v('linkedin'),
+      github: v('github'),
+      website: v('website'),
+      summary: v('summary'),
+      extraSkills: v('extraSkills'),
+      languages: v('languages'),
+      
+      // Template and visibility
+      currentTemplate: currentTemplate,
+      hiddenSections: Array.from(hiddenSections),
+      showSkillBars: showSkillBars,
+      
+      // Dynamic entries
+      experiences: [],
+      educations: [],
+      projects: [],
+      certifications: [],
+      skillBars: []
+    };
+    
+    // Save experiences
+    document.querySelectorAll('[data-type="exp"]').forEach(card => {
+      const id = card.dataset.id;
+      state.experiences.push({
+        role: v(id + '-role'),
+        company: v(id + '-company'),
+        start: v(id + '-start'),
+        end: v(id + '-end'),
+        loc: v(id + '-loc'),
+        desc: v(id + '-desc')
+      });
+    });
+    
+    // Save educations
+    document.querySelectorAll('[data-type="edu"]').forEach(card => {
+      const id = card.dataset.id;
+      state.educations.push({
+        degree: v(id + '-degree'),
+        school: v(id + '-school'),
+        year: v(id + '-year'),
+        grade: v(id + '-grade')
+      });
+    });
+    
+    // Save projects
+    document.querySelectorAll('[data-type="proj"]').forEach(card => {
+      const id = card.dataset.id;
+      state.projects.push({
+        name: v(id + '-name'),
+        tech: v(id + '-tech'),
+        link: v(id + '-link'),
+        desc: v(id + '-desc')
+      });
+    });
+    
+    // Save certifications
+    document.querySelectorAll('[data-type="cert"]').forEach(card => {
+      const id = card.dataset.id;
+      state.certifications.push({
+        name: v(id + '-name'),
+        org: v(id + '-org'),
+        year: v(id + '-year')
+      });
+    });
+    
+    // Save skill bars
+    document.querySelectorAll('[id^="sbrow-"]').forEach(row => {
+      const id = row.id.replace('sbrow-', '');
+      const name = v(id + '-name');
+      const rangeEl = document.getElementById(id + '-range');
+      if (name && rangeEl) {
+        state.skillBars.push({
+          name: name,
+          level: parseInt(rangeEl.value)
+        });
+      }
+    });
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    console.log('Data saved to localStorage');
+  } catch (e) {
+    console.error('Failed to save to localStorage:', e);
+  }
+}
+
+function loadFromLocalStorage() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return false;
+    
+    const state = JSON.parse(saved);
+    
+    // Load basics
+    setValue('firstName', state.firstName || '');
+    setValue('lastName', state.lastName || '');
+    setValue('jobTitle', state.jobTitle || '');
+    setValue('email', state.email || '');
+    setValue('phone', state.phone || '');
+    setValue('location', state.location || '');
+    setValue('linkedin', state.linkedin || '');
+    setValue('github', state.github || '');
+    setValue('website', state.website || '');
+    setValue('summary', state.summary || '');
+    setValue('extraSkills', state.extraSkills || '');
+    setValue('languages', state.languages || '');
+    
+    // Load template
+    if (state.currentTemplate) {
+      currentTemplate = state.currentTemplate;
+      document.querySelectorAll('.tpl-btn').forEach(btn => {
+        if (btn.textContent.toLowerCase() === currentTemplate) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+    
+    // Load visibility
+    if (state.hiddenSections) {
+      hiddenSections = new Set(state.hiddenSections);
+      const projToggle = document.getElementById('tog-projects');
+      const certToggle = document.getElementById('tog-certifications');
+      if (projToggle) projToggle.classList.toggle('on', !hiddenSections.has('projects'));
+      if (certToggle) certToggle.classList.toggle('on', !hiddenSections.has('certifications'));
+    }
+    
+    if (typeof state.showSkillBars !== 'undefined') {
+      showSkillBars = state.showSkillBars;
+      const skillToggle = document.getElementById('tog-skillbars');
+      if (skillToggle) skillToggle.classList.toggle('on', showSkillBars);
+    }
+    
+    // Load skill bars (clear existing first)
+    const skillBarWrap = document.getElementById('skill-bar-list');
+    if (skillBarWrap && state.skillBars && state.skillBars.length) {
+      skillBarWrap.innerHTML = '';
+      sbCount = 0;
+      state.skillBars.forEach(sb => {
+        addSkillBar(sb.name, sb.level);
+      });
+    }
+    
+    // Clear and load experiences
+    const expContainer = document.getElementById('exp-entries');
+    if (expContainer && state.experiences) {
+      expContainer.innerHTML = '';
+      expCount = 0;
+      state.experiences.forEach(exp => {
+        addExp(exp.role, exp.company, exp.start, exp.end, exp.loc, exp.desc);
+      });
+    }
+    
+    // Clear and load educations
+    const eduContainer = document.getElementById('edu-entries');
+    if (eduContainer && state.educations) {
+      eduContainer.innerHTML = '';
+      eduCount = 0;
+      state.educations.forEach(edu => {
+        addEdu(edu.degree, edu.school, edu.year, edu.grade);
+      });
+    }
+    
+    // Clear and load projects
+    const projContainer = document.getElementById('proj-entries');
+    if (projContainer && state.projects) {
+      projContainer.innerHTML = '';
+      projCount = 0;
+      state.projects.forEach(proj => {
+        addProj(proj.name, proj.tech, proj.link, proj.desc);
+      });
+    }
+    
+    // Clear and load certifications
+    const certContainer = document.getElementById('cert-entries');
+    if (certContainer && state.certifications) {
+      certContainer.innerHTML = '';
+      certCount = 0;
+      state.certifications.forEach(cert => {
+        addCert(cert.name, cert.org, cert.year);
+      });
+    }
+    
+    // Force re-render
+    live();
+    showToast('Resume loaded from saved data', 'success');
+    return true;
+  } catch (e) {
+    console.error('Failed to load from localStorage:', e);
+    return false;
+  }
+}
+
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value;
+}
+
+// Add auto-save debounce
+let saveTimeout;
+function autoSave() {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    saveToLocalStorage();
+  }, 500); // Save after 500ms of inactivity
+}
+
 /* ── STATE ── */
 let currentTemplate = 'modern';
 let expCount = 0, eduCount = 0, projCount = 0, certCount = 0, sbCount = 0;

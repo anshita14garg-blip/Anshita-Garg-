@@ -648,15 +648,19 @@ function getSkillsMainHtml() {
   const extra = v('extraSkills').split(',').map(s=>s.trim()).filter(Boolean);
   const langs = v('languages');
   let h = '';
-  if (showSkillBars && bars.length) {
+  if (bars.length) {
     h += `<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Skills</span><span class="r-sec-line"></span></div>`;
     bars.forEach(b => {
-      h += `<div class="r-skill-bar-row"><span class="r-skill-bar-name">${esc(b.name)}</span><div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div></div>`;
+      h += `<div class="r-skill-bar-row"><span class="r-skill-bar-name">${esc(b.name)}</span>`;
+      if (showSkillBars) {
+        h += `<div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div>`;
+      }
+      h += `</div>`;
     });
     h += '</div>';
   }
   if (extra.length) {
-    const heading = (!showSkillBars || !bars.length) ? '<div class="r-sec-head"><span class="r-sec-title">Skills</span><span class="r-sec-line"></span></div>' : '';
+    const heading = (!bars.length) ? '<div class="r-sec-head"><span class="r-sec-title">Skills</span><span class="r-sec-line"></span></div>' : '';
     h += `<div class="r-section">${heading}<div class="r-skill-tags">${extra.map(s=>`<span class="r-skill-tag">${esc(s)}</span>`).join('')}</div></div>`;
   }
   if (langs) {
@@ -705,10 +709,14 @@ function renderProfessional(paper) {
     ${v('jobTitle') ? `<div class="r-jobtitle">${esc(v('jobTitle'))}</div>` : ''}
     <div class="r-contacts">${getContactsHtml('<br>')}</div>`;
   if (v('summary')) sidebar += `<div class="r-sidebar-sec-title">About</div><div class="r-sidebar-text">${esc(v('summary'))}</div>`;
-  if (showSkillBars && bars.length) {
+  if (bars.length) {
     sidebar += `<div class="r-sidebar-sec-title">Skills</div>`;
     bars.forEach(b => {
-      sidebar += `<div class="r-skill-bar-row"><span class="r-skill-bar-name">${esc(b.name)}</span><div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div></div>`;
+      sidebar += `<div class="r-skill-bar-row"><span class="r-skill-bar-name">${esc(b.name)}</span>`;
+      if (showSkillBars) {
+         sidebar += `<div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div>`;
+      }
+      sidebar += `</div>`;
     });
   }
   if (extra.length) sidebar += `<div class="r-sidebar-sec-title">Tools</div><div class="r-skill-tags">${extra.map(s=>`<span class="r-skill-tag">${esc(s)}</span>`).join('')}</div>`;

@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ResumeForge — AI-Powered Resume Builder</title>
+<title>ResumeForge — AI-Powered Resume Builder with ATS Optimizer</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -25,6 +26,7 @@
   --teal-dim: rgba(78,184,160,.1);
   --red:      #e05252;
   --green:    #5db87a;
+  --orange:   #e88d3a;
   --r:  10px;
   --rs:  6px;
 }
@@ -33,9 +35,40 @@
 html{scroll-behavior:smooth}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
+/* LANDING PAGE STYLES */
+.landing-page{min-height:100vh;background:linear-gradient(135deg,#0c0b0a 0%,#141210 100%);}
+.hero{position:relative;overflow:hidden;padding:80px 24px 100px;text-align:center}
+.hero-glow{position:absolute;top:-20%;left:-20%;width:140%;height:140%;background:radial-gradient(circle, rgba(212,168,83,0.08) 0%, transparent 70%);pointer-events:none}
+.hero-badge{display:inline-block;padding:6px 14px;background:var(--gold-dim);border:1px solid rgba(212,168,83,.3);border-radius:40px;font-size:12px;font-weight:500;color:var(--gold);margin-bottom:24px;backdrop-filter:blur(4px)}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(44px,8vw,76px);font-weight:700;background:linear-gradient(135deg,#f2ede4 0%,#d4a853 100%);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:20px}
+.hero p{font-size:18px;color:var(--text2);max-width:600px;margin:0 auto 32px;line-height:1.6}
+.hero-buttons{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-large{padding:14px 32px;font-size:16px;border-radius:40px}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;max-width:1200px;margin:0 auto 80px;padding:0 24px}
+.feature-card{background:rgba(30,29,26,0.6);backdrop-filter:blur(10px);border:1px solid var(--bdr);border-radius:24px;padding:32px 24px;transition:all .3s}
+.feature-card:hover{transform:translateY(-5px);border-color:var(--gold-dim);background:rgba(30,29,26,0.8)}
+.feature-icon{width:56px;height:56px;background:var(--gold-dim);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:20px}
+.feature-card h3{font-size:20px;margin-bottom:12px}
+.feature-card p{color:var(--text2);font-size:14px;line-height:1.6}
+.auth-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(12,11,10,0.96);backdrop-filter:blur(12px);z-index:1000;display:none;align-items:center;justify-content:center}
+.auth-modal{background:var(--surf1);border:1px solid var(--bdr2);border-radius:28px;width:90%;max-width:460px;padding:32px;box-shadow:0 25px 50px rgba(0,0,0,.5)}
+.auth-modal h2{font-family:'Playfair Display',serif;font-size:28px;margin-bottom:8px}
+.auth-modal .sub{color:var(--text3);margin-bottom:28px;font-size:14px}
+.auth-input{width:100%;margin-bottom:16px}
+.auth-input input{width:100%;padding:14px 16px;background:var(--surf2);border:1px solid var(--bdr2);border-radius:12px;color:var(--text);font-size:15px}
+.auth-btn{width:100%;padding:14px;background:var(--gold);border:none;border-radius:40px;color:#1a1208;font-weight:600;font-size:15px;cursor:pointer;margin-top:12px;transition:all .2s}
+.auth-btn:hover{background:var(--gold2)}
+.auth-switch{text-align:center;margin-top:24px;font-size:13px;color:var(--text3)}
+.auth-switch a{color:var(--gold);cursor:pointer;text-decoration:none}
+.close-auth{position:absolute;top:24px;right:24px;background:var(--surf2);border:none;color:var(--text2);font-size:20px;width:40px;height:40px;border-radius:40px;cursor:pointer}
+.user-menu{display:flex;align-items:center;gap:12px}
+.user-avatar{width:36px;height:36px;background:var(--gold-dim);border-radius:40px;display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--gold);border:1px solid rgba(212,168,83,.3)}
+.logout-btn{background:transparent;border:1px solid var(--bdr2);padding:6px 14px;border-radius:30px;font-size:12px;cursor:pointer;color:var(--text2)}
+.logout-btn:hover{background:var(--surf2);color:var(--text)}
+
 /* TOPBAR */
 .topbar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:rgba(12,11,10,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr)}
-.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-wrap{display:flex;align-items:center;gap:10px;cursor:pointer}
 .logo-icon{width:32px;height:32px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .logo-text{font-family:'Playfair Display',serif;font-size:18px;color:var(--text)}
 .logo-text span{color:var(--gold)}
@@ -53,9 +86,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .btn-primary:hover{background:var(--gold2)}
 .btn-teal{background:var(--teal-dim);border-color:rgba(78,184,160,.3);color:var(--teal)}
 .btn-teal:hover{background:rgba(78,184,160,.2)}
+.btn-orange{background:rgba(232,141,58,0.15);border-color:rgba(232,141,58,.3);color:var(--orange)}
+.btn-orange:hover{background:rgba(232,141,58,0.25)}
 
 /* LAYOUT */
-.app-grid{display:grid;grid-template-columns:280px 1fr 1fr;height:calc(100vh - 56px);overflow:hidden}
+.app-grid{display:grid;grid-template-columns:260px 1fr 1fr;height:calc(100vh - 56px);overflow:hidden}
+.main-app{display:none}
+.landing-container{display:block}
 
 /* SIDEBAR */
 .sidebar{background:var(--surf1);border-right:1px solid var(--bdr);overflow-y:auto;padding:20px 12px 32px;display:flex;flex-direction:column;gap:1px}
@@ -94,6 +131,26 @@ input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 
 input::placeholder,textarea::placeholder{color:var(--text3)}
 textarea{min-height:80px;line-height:1.65}
 
+/* ATS OPTIMIZER STYLES */
+.ats-card{background:linear-gradient(135deg,rgba(78,184,160,.08),rgba(212,168,83,.08));border:1px solid rgba(78,184,160,.2);border-radius:var(--r);padding:18px;margin-bottom:20px}
+.ats-score-circle{width:100px;height:100px;border-radius:50%;background:conic-gradient(var(--gold) 0deg, var(--bdr2) 0deg);display:flex;align-items:center;justify-content:center;margin:0 auto 15px}
+.ats-score-inner{width:80px;height:80px;border-radius:50%;background:var(--surf1);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ats-score-number{font-size:28px;font-weight:700;color:var(--gold)}
+.ats-score-label{font-size:10px;color:var(--text3)}
+.ats-metric{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr)}
+.ats-metric-label{font-size:12px;color:var(--text2)}
+.ats-metric-value{font-size:14px;font-weight:600}
+.ats-metric-value.good{color:var(--green)}
+.ats-metric-value.warning{color:var(--orange)}
+.ats-metric-value.bad{color:var(--red)}
+.ats-keyword-tag{display:inline-block;background:var(--gold-dim);color:var(--gold);padding:4px 10px;border-radius:20px;font-size:11px;margin:4px}
+.ats-keyword-tag.missing{background:rgba(224,82,82,0.15);color:var(--red);text-decoration:line-through}
+.ats-suggestion{background:rgba(52,211,153,0.1);border-left:3px solid var(--green);padding:10px 12px;margin:8px 0;font-size:12px;border-radius:6px}
+.ats-warning{background:rgba(232,141,58,0.1);border-left:3px solid var(--orange);padding:10px 12px;margin:8px 0;font-size:12px;border-radius:6px}
+.job-desc-input{background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--rs);color:var(--text);font-size:13px;padding:12px;width:100%;min-height:150px;font-family:inherit}
+.ats-header{display:flex;align-items:center;gap:10px;margin-bottom:15px}
+.ats-header-icon{width:36px;height:36px;background:rgba(232,141,58,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+
 /* ENTRY CARDS */
 .entries{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
 .entry-card{background:var(--surf1);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;transition:border-color .2s}
@@ -125,7 +182,6 @@ textarea{min-height:80px;line-height:1.65}
 .ai-box{background:linear-gradient(135deg,rgba(78,184,160,.06),rgba(212,168,83,.06));border:1px solid rgba(78,184,160,.2);border-radius:var(--r);padding:14px;margin-top:8px}
 .ai-box-head{display:flex;align-items:center;gap:7px;margin-bottom:10px}
 .ai-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--teal);background:var(--teal-dim);border:1px solid rgba(78,184,160,.2);padding:2px 8px;border-radius:20px}
-.ai-box-title{font-size:13px;font-weight:500;color:var(--text)}
 .ai-suggestions{display:flex;flex-direction:column;gap:6px}
 .ai-suggestion{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;background:var(--surf1);border:1px solid var(--bdr2);border-radius:var(--rs);cursor:pointer;transition:all .15s;font-size:12.5px;color:var(--text2);line-height:1.5}
 .ai-suggestion:hover{border-color:var(--gold);color:var(--text);background:var(--gold-dim)}
@@ -135,20 +191,16 @@ textarea{min-height:80px;line-height:1.65}
 .ai-spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(78,184,160,.3);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .api-note{font-size:11.5px;color:var(--text3);margin-top:8px;line-height:1.6}
-.api-note a{color:var(--teal);text-decoration:none}
 
 /* PREVIEW */
 .preview-wrap{overflow-y:auto;padding:28px 20px;background:#d8d4cc;position:relative}
 .resume-paper{max-width:680px;margin:0 auto;box-shadow:0 8px 48px rgba(0,0,0,.25);border-radius:2px;overflow:hidden;min-height:900px;transition:all .3s ease}
-
-/* TEMPLATE: MODERN */
 .tmpl-modern{background:#fff;font-family:'Plus Jakarta Sans',sans-serif;color:#1c1a17}
 .tmpl-modern .r-accent-bar{height:6px;background:linear-gradient(90deg,#1c3d5a,#2d7dd2,#4eb8a0)}
 .tmpl-modern .r-body{padding:36px 44px}
-.tmpl-modern .r-name{font-size:30px;font-weight:600;color:#1c1a17;margin-bottom:3px;letter-spacing:-.01em}
+.tmpl-modern .r-name{font-size:30px;font-weight:600;color:#1c1a17;margin-bottom:3px}
 .tmpl-modern .r-jobtitle{font-size:14px;color:#2d7dd2;font-weight:500;margin-bottom:12px}
 .tmpl-modern .r-contacts{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:#5a5650;margin-bottom:22px}
-.tmpl-modern .r-contacts span{display:flex;align-items:center;gap:3px}
 .tmpl-modern .r-section{margin-bottom:20px}
 .tmpl-modern .r-sec-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .tmpl-modern .r-sec-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#2d7dd2}
@@ -166,95 +218,67 @@ textarea{min-height:80px;line-height:1.65}
 .tmpl-modern .r-skill-bar-name{font-size:12px;color:#3a3733;min-width:120px}
 .tmpl-modern .r-skill-bar-track{flex:1;height:4px;background:#e8e4de;border-radius:2px;overflow:hidden}
 .tmpl-modern .r-skill-bar-fill{height:100%;background:linear-gradient(90deg,#2d7dd2,#4eb8a0);border-radius:2px}
-
-/* TEMPLATE: MINIMAL */
-.tmpl-minimal{background:#f9f7f4;font-family:'Plus Jakarta Sans',sans-serif;color:#1c1a17}
-.tmpl-minimal .r-body{padding:48px 52px}
-.tmpl-minimal .r-name{font-size:36px;font-weight:300;letter-spacing:-.02em;color:#1c1a17;margin-bottom:4px}
-.tmpl-minimal .r-jobtitle{font-size:13px;color:#7a756e;font-weight:400;margin-bottom:10px;letter-spacing:.04em;text-transform:uppercase}
-.tmpl-minimal .r-contacts{display:flex;flex-wrap:wrap;gap:16px;font-size:11px;color:#7a756e;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid #ddd9d0}
-.tmpl-minimal .r-section{margin-bottom:24px}
-.tmpl-minimal .r-sec-title{font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b0aa9f;margin-bottom:12px}
-.tmpl-minimal .r-summary-text{font-size:13px;color:#3a3733;line-height:1.8}
-.tmpl-minimal .r-entry{margin-bottom:14px}
-.tmpl-minimal .r-row{display:flex;justify-content:space-between;align-items:baseline}
-.tmpl-minimal .r-role{font-size:13px;font-weight:500;color:#1c1a17}
-.tmpl-minimal .r-date{font-size:11px;color:#b0aa9f}
-.tmpl-minimal .r-org{font-size:12px;color:#7a756e;margin-bottom:4px}
-.tmpl-minimal .r-desc{font-size:12px;color:#4a4640;line-height:1.75;white-space:pre-wrap}
-.tmpl-minimal .r-skill-tags{display:flex;flex-wrap:wrap;gap:6px}
-.tmpl-minimal .r-skill-tag{font-size:11px;padding:4px 11px;background:#ece8e0;color:#4a4640;border-radius:2px}
-.tmpl-minimal .r-skill-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-.tmpl-minimal .r-skill-bar-name{font-size:12px;color:#3a3733;min-width:120px}
-.tmpl-minimal .r-skill-bar-track{flex:1;height:2px;background:#ddd9d0;border-radius:1px;overflow:hidden}
-.tmpl-minimal .r-skill-bar-fill{height:100%;background:#1c1a17;border-radius:1px}
-
-/* TEMPLATE: PROFESSIONAL */
-.tmpl-professional{background:#fff;font-family:'Plus Jakarta Sans',sans-serif;color:#1c1a17;display:grid;grid-template-columns:220px 1fr}
+.tmpl-minimal{background:#f9f7f4}
+.tmpl-professional{background:#fff;display:grid;grid-template-columns:220px 1fr}
 .tmpl-professional .r-sidebar{background:#1c2b3a;padding:32px 20px}
 .tmpl-professional .r-main{padding:32px 28px}
-.tmpl-professional .r-name{font-size:22px;font-weight:600;color:#fff;margin-bottom:4px;line-height:1.2}
-.tmpl-professional .r-jobtitle{font-size:11px;color:#7faecf;text-transform:uppercase;letter-spacing:.08em;margin-bottom:22px}
-.tmpl-professional .r-contacts{display:flex;flex-direction:column;gap:6px;font-size:10.5px;color:#a8c4d8;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.1)}
-.tmpl-professional .r-sidebar-sec-title{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#d4a853;margin:18px 0 8px}
-.tmpl-professional .r-sidebar-text{font-size:11.5px;color:#c0d4e4;line-height:1.7}
-.tmpl-professional .r-skill-tags{display:flex;flex-wrap:wrap;gap:4px}
-.tmpl-professional .r-skill-tag{font-size:10px;padding:2px 8px;background:rgba(255,255,255,.07);color:#a8c4d8;border-radius:3px;border:1px solid rgba(255,255,255,.1)}
-.tmpl-professional .r-skill-bar-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.tmpl-professional .r-skill-bar-name{font-size:11px;color:#c0d4e4;min-width:80px}
-.tmpl-professional .r-skill-bar-track{flex:1;height:3px;background:rgba(255,255,255,.1);border-radius:1.5px;overflow:hidden}
-.tmpl-professional .r-skill-bar-fill{height:100%;background:#d4a853;border-radius:1.5px}
-.tmpl-professional .r-section{margin-bottom:20px}
-.tmpl-professional .r-sec-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.tmpl-professional .r-sec-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1c2b3a}
-.tmpl-professional .r-sec-line{flex:1;height:1px;background:#e0ddd6}
-.tmpl-professional .r-summary-text{font-size:12.5px;color:#3a3733;line-height:1.75}
-.tmpl-professional .r-entry{margin-bottom:13px}
-.tmpl-professional .r-row{display:flex;justify-content:space-between;align-items:baseline}
-.tmpl-professional .r-role{font-size:13px;font-weight:600;color:#1c1a17}
-.tmpl-professional .r-date{font-size:10.5px;color:#888}
-.tmpl-professional .r-org{font-size:12px;color:#1c6699;font-weight:500;margin-bottom:3px}
-.tmpl-professional .r-desc{font-size:11.5px;color:#3a3733;line-height:1.75;white-space:pre-wrap}
-
-/* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--r);padding:12px 18px;font-size:13px;color:var(--text2);box-shadow:0 8px 32px rgba(0,0,0,.4);opacity:0;pointer-events:none;transform:translateY(8px);transition:all .25s;z-index:999;max-width:300px}
 .toast.show{opacity:1;pointer-events:auto;transform:none}
-.toast.success{border-color:rgba(93,184,122,.35);color:var(--green)}
-.toast.error{border-color:rgba(224,82,82,.35);color:var(--red)}
-
-/* SCROLLBAR */
+.export-loading{position:fixed;inset:0;z-index:300;background:rgba(12,11,10,.85);backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.export-loading.show{display:flex}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--text3)}
-
-/* EXPORT LOADING */
-.export-loading{position:fixed;inset:0;z-index:300;background:rgba(12,11,10,.85);backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.export-loading.show{display:flex}
-.export-loading-ring{width:48px;height:48px;border:3px solid var(--bdr2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
-.export-loading p{font-size:14px;color:var(--text2)}
 </style>
 </head>
 <body>
 
+<!-- LANDING PAGE -->
+<div id="landingPage" class="landing-page landing-container">
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-badge">✨ AI-Powered Resume Builder + ATS Optimizer</div>
+    <h1>Forge Your<br>Future Career</h1>
+    <p>Create stunning, ATS-optimized resumes with AI assistance. Get real-time keyword analysis, compatibility scoring, and smart suggestions to beat applicant tracking systems.</p>
+    <div class="hero-buttons">
+      <button class="btn btn-primary btn-large" onclick="openAuth('login')">Get Started →</button>
+      <button class="btn btn-ghost btn-large" onclick="openAuth('register')">Sign Up Free</button>
+    </div>
+  </div>
+  <div class="features">
+    <div class="feature-card"><div class="feature-icon">🤖</div><h3>AI-Powered Suggestions</h3><p>Get intelligent bullet points, summaries, and project descriptions with GPT-4 integration.</p></div>
+    <div class="feature-card"><div class="feature-icon">📊</div><h3>ATS Score & Optimization</h3><p>Analyze your resume against job descriptions. Get keyword matching, compatibility score, and improvement suggestions.</p></div>
+    <div class="feature-card"><div class="feature-icon">📄</div><h3>Multiple Templates</h3><p>Modern, Minimal, and Professional templates — switch instantly with live preview.</p></div>
+    <div class="feature-card"><div class="feature-icon">⚡</div><h3>Smart Resume Scoring</h3><p>Real-time feedback on completeness and ATS readiness.</p></div>
+    <div class="feature-card"><div class="feature-icon">🎨</div><h3>Skill Visualization</h3><p>Showcase your expertise with dynamic skill bars and tag clouds.</p></div>
+    <div class="feature-card"><div class="feature-icon">💾</div><h3>PDF Export</h3><p>Download your resume as a professional PDF with one click.</p></div>
+  </div>
+</div>
+
+<!-- AUTH OVERLAY -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-modal">
+    <button class="close-auth" onclick="closeAuth()">✕</button>
+    <h2 id="authTitle">Welcome Back</h2>
+    <div class="sub" id="authSub">Sign in to continue building your resume</div>
+    <div id="authForm">
+      <div class="auth-input"><input type="text" id="authName" placeholder="Full Name" style="display:none"></div>
+      <div class="auth-input"><input type="email" id="authEmail" placeholder="Email address"></div>
+      <div class="auth-input"><input type="password" id="authPassword" placeholder="Password"></div>
+      <button class="auth-btn" id="authActionBtn" onclick="submitAuth()">Sign In</button>
+    </div>
+    <div class="auth-switch" id="authSwitch"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="main-app">
 <header class="topbar">
-  <div class="logo-wrap">
-    <div class="logo-icon">📄</div>
-    <div class="logo-text">Resume<span>Forge</span></div>
-  </div>
-  <div class="topbar-center">
-    <button class="tpl-btn active" onclick="setTemplate('modern',this)">Modern</button>
-    <button class="tpl-btn" onclick="setTemplate('minimal',this)">Minimal</button>
-    <button class="tpl-btn" onclick="setTemplate('professional',this)">Professional</button>
-  </div>
-  <div class="topbar-right">
-    <div class="score-pill">Resume score <span class="score-num" id="score-num">0%</span></div>
-    <button class="btn btn-ghost" onclick="exportPDF()">⬇ Export PDF</button>
-  </div>
+  <div class="logo-wrap" onclick="showLanding()"><div class="logo-icon">📄</div><div class="logo-text">Resume<span>Forge</span></div></div>
+  <div class="topbar-center"><button class="tpl-btn active" onclick="setTemplate('modern',this)">Modern</button><button class="tpl-btn" onclick="setTemplate('minimal',this)">Minimal</button><button class="tpl-btn" onclick="setTemplate('professional',this)">Professional</button></div>
+  <div class="topbar-right"><div class="score-pill">Resume score <span class="score-num" id="score-num">0%</span></div><button class="btn btn-ghost" onclick="exportPDF()">⬇ Export PDF</button><div class="user-menu"><div class="user-avatar" id="userAvatar">👤</div><button class="logout-btn" onclick="logout()">Logout</button></div></div>
 </header>
-
 <div class="app-grid">
-
   <nav class="sidebar">
     <div class="sb-group-label">Sections</div>
     <div class="nav-item active" id="nav-basics" onclick="showPanel('basics',this)"><div class="nav-icon">👤</div> Contact Info<span class="check">✓</span></div>
@@ -264,6 +288,7 @@ textarea{min-height:80px;line-height:1.65}
     <div class="nav-item" id="nav-skills" onclick="showPanel('skills',this)"><div class="nav-icon">⚡</div> Skills<span class="check">✓</span></div>
     <div class="nav-item" id="nav-projects" onclick="showPanel('projects',this)"><div class="nav-icon">🚀</div> Projects<span class="check">✓</span></div>
     <div class="nav-item" id="nav-certifications" onclick="showPanel('certifications',this)"><div class="nav-icon">🏅</div> Certifications<span class="check">✓</span></div>
+    <div class="nav-item" id="nav-ats" onclick="showPanel('ats',this)"><div class="nav-icon">📊</div> ATS Optimizer<span class="check">✓</span></div>
     <div class="sb-sep"></div>
     <div class="sb-group-label">Visibility</div>
     <div class="section-toggle"><span class="toggle-label">Show Projects</span><button class="toggle-switch on" id="tog-projects" onclick="toggleSection('projects',this)"></button></div>
@@ -271,639 +296,253 @@ textarea{min-height:80px;line-height:1.65}
     <div class="section-toggle"><span class="toggle-label">Skill Bars</span><button class="toggle-switch on" id="tog-skillbars" onclick="toggleSkillBars(this)"></button></div>
     <div class="sb-sep"></div>
     <div class="sb-group-label">AI Settings</div>
-    <div style="padding:0 6px">
-      <div class="field" style="margin-bottom:8px">
-        <label>OpenAI API Key <span style="color:var(--text3);font-size:9px;text-transform:none">(optional)</span></label>
-        <input type="password" id="openai-key" placeholder="sk-..." style="font-size:11px;padding:7px 10px">
-      </div>
-      <div class="api-note">Leave blank for rule-based suggestions. Add key for GPT-4 suggestions.</div>
-    </div>
+    <div style="padding:0 6px"><div class="field" style="margin-bottom:8px"><label>OpenAI API Key <span style="color:var(--text3);font-size:9px">(optional)</span></label><input type="password" id="openai-key" placeholder="sk-..." style="font-size:11px;padding:7px 10px"></div><div class="api-note">Leave blank for rule-based suggestions.</div></div>
   </nav>
-
   <div class="editor" id="editor">
-
-    <div class="section-panel active" id="panel-basics">
-      <div class="panel-head"><div class="panel-title">Contact Info</div><div class="panel-desc">Your name and details appear at the very top of your resume.</div></div>
-      <div class="row2">
-        <div class="field"><label>First Name</label><input id="firstName" placeholder="Aanya" oninput="live()"></div>
-        <div class="field"><label>Last Name</label><input id="lastName" placeholder="Sharma" oninput="live()"></div>
+    <div class="section-panel active" id="panel-basics"><div class="panel-head"><div class="panel-title">Contact Info</div><div class="panel-desc">Your name and details appear at the very top of your resume.</div></div><div class="row2"><div class="field"><label>First Name</label><input id="firstName" placeholder="Aanya" oninput="live(); updateATSScore()"></div><div class="field"><label>Last Name</label><input id="lastName" placeholder="Sharma" oninput="live(); updateATSScore()"></div></div><div class="field"><label>Job Title / Role</label><input id="jobTitle" placeholder="Full-Stack Developer" oninput="live(); updateATSScore()"></div><div class="row2"><div class="field"><label>Email</label><input id="email" type="email" placeholder="aanya@example.com" oninput="live()"></div><div class="field"><label>Phone</label><input id="phone" placeholder="+91 98765 43210" oninput="live()"></div></div><div class="row2"><div class="field"><label>Location</label><input id="location" placeholder="Bengaluru, India" oninput="live()"></div><div class="field"><label>LinkedIn</label><input id="linkedin" placeholder="linkedin.com/in/aanya" oninput="live()"></div></div><div class="row2"><div class="field"><label>GitHub</label><input id="github" placeholder="github.com/aanya" oninput="live()"></div><div class="field"><label>Portfolio</label><input id="website" placeholder="aanya.dev" oninput="live()"></div></div></div>
+    <div class="section-panel" id="panel-summary"><div class="panel-head"><div class="panel-title">Professional Summary</div><div class="panel-desc">2–3 punchy sentences.</div></div><div class="field"><label>Summary</label><textarea id="summary" rows="5" placeholder="Passionate full-stack developer..." oninput="live(); updateATSScore()"></textarea></div><div class="ai-box"><div class="ai-box-head"><span class="ai-badge">✦ AI</span><span class="ai-box-title">Smart suggestions</span></div><div class="ai-input-row"><input type="text" id="summary-ai-input" placeholder="Role or key skills"><button class="btn btn-teal" onclick="suggestSummary()">Suggest</button></div><div class="ai-suggestions" id="summary-suggestions"></div></div></div>
+    <div class="section-panel" id="panel-experience"><div class="panel-head"><div class="panel-title">Work Experience</div></div><div class="entries" id="exp-entries"></div><button class="add-entry" onclick="addExp()">＋ Add work experience</button><div class="ai-box" style="margin-top:18px"><div class="ai-box-head"><span class="ai-badge">✦ AI</span><span class="ai-box-title">Generate bullet points</span></div><div class="ai-input-row"><input type="text" id="bullet-ai-input" placeholder="e.g. Built React dashboard"><button class="btn btn-teal" onclick="suggestBullets()">Suggest</button></div><div class="ai-suggestions" id="bullet-suggestions"></div></div></div>
+    <div class="section-panel" id="panel-education"><div class="panel-head"><div class="panel-title">Education</div></div><div class="entries" id="edu-entries"></div><button class="add-entry" onclick="addEdu()">＋ Add education</button></div>
+    <div class="section-panel" id="panel-skills"><div class="panel-head"><div class="panel-title">Skills</div></div><div id="skill-bars-section"><div class="sb-group-label" style="padding:0 0 8px">Skill Bars</div><div class="skill-bar-wrap" id="skill-bar-list"></div><button class="add-entry" onclick="addSkillBar()" style="margin-bottom:18px">＋ Add skill with bar</button></div><div class="field"><label>Additional Skills</label><textarea id="extraSkills" rows="2" placeholder="Git, Docker, Agile" oninput="live(); updateATSScore()"></textarea></div><div class="field"><label>Languages</label><input id="languages" placeholder="English, Hindi" oninput="live()"></div></div>
+    <div class="section-panel" id="panel-projects"><div class="panel-head"><div class="panel-title">Projects</div></div><div class="entries" id="proj-entries"></div><button class="add-entry" onclick="addProj()">＋ Add project</button><div class="ai-box" style="margin-top:18px"><div class="ai-box-head"><span class="ai-badge">✦ AI</span><span class="ai-box-title">Improve descriptions</span></div><div class="ai-input-row"><input type="text" id="proj-ai-input" placeholder="e.g. E-commerce app"><button class="btn btn-teal" onclick="suggestProject()">Suggest</button></div><div class="ai-suggestions" id="proj-suggestions"></div></div></div>
+    <div class="section-panel" id="panel-certifications"><div class="panel-head"><div class="panel-title">Certifications</div></div><div class="entries" id="cert-entries"></div><button class="add-entry" onclick="addCert()">＋ Add certification</button></div>
+    
+    <!-- ATS OPTIMIZER PANEL -->
+    <div class="section-panel" id="panel-ats">
+      <div class="panel-head"><div class="panel-title">ATS Optimizer</div><div class="panel-desc">Analyze your resume against job descriptions. Get keyword matching, compatibility score, and actionable suggestions to beat Applicant Tracking Systems.</div></div>
+      
+      <!-- Job Description Input -->
+      <div class="ats-card">
+        <div class="ats-header"><div class="ats-header-icon">📋</div><h3 style="margin:0">Job Description</h3></div>
+        <textarea id="jobDescription" class="job-desc-input" placeholder="Paste the job description here to analyze keyword matching and get ATS optimization suggestions..."></textarea>
+        <button class="btn btn-orange" onclick="analyzeATS()" style="margin-top:12px; width:100%">🔍 Analyze Against Job Description</button>
       </div>
-      <div class="field"><label>Job Title / Role</label><input id="jobTitle" placeholder="Full-Stack Developer" oninput="live()"></div>
-      <div class="row2">
-        <div class="field"><label>Email</label><input id="email" type="email" placeholder="aanya@example.com" oninput="live()"></div>
-        <div class="field"><label>Phone</label><input id="phone" placeholder="+91 98765 43210" oninput="live()"></div>
-      </div>
-      <div class="row2">
-        <div class="field"><label>Location</label><input id="location" placeholder="Bengaluru, India" oninput="live()"></div>
-        <div class="field"><label>LinkedIn</label><input id="linkedin" placeholder="linkedin.com/in/aanya" oninput="live()"></div>
-      </div>
-      <div class="row2">
-        <div class="field"><label>GitHub</label><input id="github" placeholder="github.com/aanya" oninput="live()"></div>
-        <div class="field"><label>Portfolio / Website</label><input id="website" placeholder="aanya.dev" oninput="live()"></div>
-      </div>
-    </div>
-
-    <div class="section-panel" id="panel-summary">
-      <div class="panel-head"><div class="panel-title">Professional Summary</div><div class="panel-desc">2–3 punchy sentences. Highlight your experience, key skills, and what makes you stand out.</div></div>
-      <div class="field"><label>Summary</label><textarea id="summary" rows="5" placeholder="Passionate full-stack developer with 3+ years building scalable web applications..." oninput="live()"></textarea></div>
-      <div class="ai-box">
-        <div class="ai-box-head"><span class="ai-badge">✦ AI</span><span class="ai-box-title">Smart suggestions for your summary</span></div>
-        <div class="ai-input-row">
-          <input type="text" id="summary-ai-input" placeholder="Type your role or key skills (e.g. React developer, 3 years)">
-          <button class="btn btn-teal" onclick="suggestSummary()" style="white-space:nowrap;font-size:12px">Suggest</button>
+      
+      <!-- ATS Score Display -->
+      <div class="ats-card" id="atsScoreCard">
+        <div class="ats-header"><div class="ats-header-icon">📊</div><h3 style="margin:0">ATS Compatibility Score</h3></div>
+        <div style="text-align:center">
+          <div class="ats-score-circle" id="atsScoreCircle">
+            <div class="ats-score-inner"><span class="ats-score-number" id="atsScoreNumber">0</span><span class="ats-score-label">/100</span></div>
+          </div>
         </div>
-        <div class="ai-suggestions" id="summary-suggestions"></div>
+        <div id="atsMetrics"></div>
       </div>
-    </div>
-
-    <div class="section-panel" id="panel-experience">
-      <div class="panel-head"><div class="panel-title">Work Experience</div><div class="panel-desc">Most recent first. Focus on impact — use numbers when you can.</div></div>
-      <div class="entries" id="exp-entries"></div>
-      <button class="add-entry" onclick="addExp()">＋ Add work experience</button>
-      <div class="ai-box" style="margin-top:18px">
-        <div class="ai-box-head"><span class="ai-badge">✦ AI</span><span class="ai-box-title">Auto-generate bullet points</span></div>
-        <div class="ai-input-row">
-          <input type="text" id="bullet-ai-input" placeholder="e.g. Built React dashboard, reduced load time">
-          <button class="btn btn-teal" onclick="suggestBullets()" style="white-space:nowrap;font-size:12px">Suggest</button>
-        </div>
-        <div class="ai-suggestions" id="bullet-suggestions"></div>
+      
+      <!-- Keyword Analysis -->
+      <div class="ats-card" id="keywordCard">
+        <div class="ats-header"><div class="ats-header-icon">🔑</div><h3 style="margin:0">Keyword Analysis</h3></div>
+        <div id="keywordAnalysis"></div>
       </div>
-    </div>
-
-    <div class="section-panel" id="panel-education">
-      <div class="panel-head"><div class="panel-title">Education</div><div class="panel-desc">Degrees, courses, and academic highlights.</div></div>
-      <div class="entries" id="edu-entries"></div>
-      <button class="add-entry" onclick="addEdu()">＋ Add education</button>
-    </div>
-
-    <div class="section-panel" id="panel-skills">
-      <div class="panel-head"><div class="panel-title">Skills</div><div class="panel-desc">Add skill bars to visually show proficiency, or use plain tags.</div></div>
-      <div id="skill-bars-section">
-        <div class="sb-group-label" style="padding:0 0 8px">Skill Bars (with proficiency)</div>
-        <div class="skill-bar-wrap" id="skill-bar-list"></div>
-        <button class="add-entry" onclick="addSkillBar()" style="margin-bottom:18px">＋ Add skill with bar</button>
+      
+      <!-- Suggestions -->
+      <div class="ats-card" id="suggestionsCard">
+        <div class="ats-header"><div class="ats-header-icon">💡</div><h3 style="margin:0">Improvement Suggestions</h3></div>
+        <div id="atsSuggestions"></div>
       </div>
-      <div class="field"><label>Additional Skills (comma separated)</label><textarea id="extraSkills" rows="2" placeholder="Git, Docker, Agile, REST APIs, MySQL" oninput="live()"></textarea></div>
-      <div class="field"><label>Languages</label><input id="languages" placeholder="English (Fluent), Hindi (Native)" oninput="live()"></div>
+      
+      <div class="api-note" style="margin-top:12px">💡 Tip: Paste the job description to see how well your resume matches. Add missing keywords to your skills section or experience descriptions for better ATS ranking.</div>
     </div>
-
-    <div class="section-panel" id="panel-projects">
-      <div class="panel-head"><div class="panel-title">Projects</div><div class="panel-desc">Personal, freelance, or open-source work that shows your abilities.</div></div>
-      <div class="entries" id="proj-entries"></div>
-      <button class="add-entry" onclick="addProj()">＋ Add project</button>
-      <div class="ai-box" style="margin-top:18px">
-        <div class="ai-box-head"><span class="ai-badge">✦ AI</span><span class="ai-box-title">Improve project descriptions</span></div>
-        <div class="ai-input-row">
-          <input type="text" id="proj-ai-input" placeholder="e.g. E-commerce app using React and Firebase">
-          <button class="btn btn-teal" onclick="suggestProject()" style="white-space:nowrap;font-size:12px">Suggest</button>
-        </div>
-        <div class="ai-suggestions" id="proj-suggestions"></div>
-      </div>
-    </div>
-
-    <div class="section-panel" id="panel-certifications">
-      <div class="panel-head"><div class="panel-title">Certifications</div><div class="panel-desc">Professional certificates and online courses.</div></div>
-      <div class="entries" id="cert-entries"></div>
-      <button class="add-entry" onclick="addCert()">＋ Add certification</button>
-    </div>
-
   </div>
-
-  <div class="preview-wrap" id="preview-wrap">
-    <div id="resume-paper" class="resume-paper tmpl-modern"></div>
-  </div>
-
+  <div class="preview-wrap" id="preview-wrap"><div id="resume-paper" class="resume-paper tmpl-modern"></div></div>
 </div>
-
+</div>
 <div class="toast" id="toast"></div>
-<div class="export-loading" id="export-loading">
-  <div class="export-loading-ring"></div>
-  <p>Generating your PDF…</p>
-</div>
+<div class="export-loading" id="export-loading"><div class="export-loading-ring"></div><p>Generating your PDF…</p></div>
 
 <script>
-/* ── STATE ── */
-let currentTemplate = 'modern';
-let expCount = 0, eduCount = 0, projCount = 0, certCount = 0, sbCount = 0;
-let hiddenSections = new Set();
-let showSkillBars = true;
-let toastTimer;
+let currentTemplate='modern',expCount=0,eduCount=0,projCount=0,certCount=0,sbCount=0,hiddenSections=new Set(),showSkillBars=true,toastTimer;
+let currentUser=null;
 
-/* ── HELPERS ── */
-function v(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; }
-function esc(s) { if (!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function live() { renderResume(); updateScore(); }
+// ATS State
+let currentATSScore = 0;
+let currentKeywords = { present: [], missing: [] };
 
-/* ── NAVIGATION ── */
-function showPanel(name, el) {
-  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-  if (el) el.classList.add('active');
-}
+function v(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+function esc(s){if(!s)return '';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function live(){if(currentUser)renderResume();updateScore();}
+function showPanel(name,el){document.querySelectorAll('.section-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('panel-'+name).classList.add('active');if(el)el.classList.add('active');}
+function toggleSection(sec,btn){btn.classList.toggle('on');btn.classList.contains('on')?hiddenSections.delete(sec):hiddenSections.add(sec);live();}
+function toggleSkillBars(btn){btn.classList.toggle('on');showSkillBars=btn.classList.contains('on');live();}
 
-/* ── TOGGLES ── */
-function toggleSection(sec, btn) {
-  btn.classList.toggle('on');
-  btn.classList.contains('on') ? hiddenSections.delete(sec) : hiddenSections.add(sec);
-  live();
-}
-function toggleSkillBars(btn) {
-  btn.classList.toggle('on');
-  showSkillBars = btn.classList.contains('on');
-  live();
-}
-
-/* ── SKILL BARS ── */
-function addSkillBar(name='', level=70) {
-  const id = 'sb' + (++sbCount);
-  const wrap = document.getElementById('skill-bar-list');
-  const row = document.createElement('div');
-  row.className = 'skill-bar-item';
-  row.id = 'sbrow-' + id;
-  row.innerHTML = `
-    <input type="text" id="${id}-name" placeholder="JavaScript" value="${esc(name)}" oninput="live()">
-    <span class="skill-level-label" id="${id}-label">${getLevelLabel(level)}</span>
-    <input type="range" class="skill-range" id="${id}-range" min="10" max="100" value="${level}" style="--val:${level}%" oninput="updateSkillBar('${id}',this)">
-    <button class="ic-btn del" onclick="document.getElementById('sbrow-${id}').remove();live();">✕</button>`;
-  wrap.appendChild(row);
-  live();
-}
-function updateSkillBar(id, input) {
-  input.style.setProperty('--val', input.value + '%');
-  const lbl = document.getElementById(id + '-label');
-  if (lbl) lbl.textContent = getLevelLabel(parseInt(input.value));
-  live();
-}
-function getLevelLabel(val) {
-  if (val >= 90) return 'Expert';
-  if (val >= 75) return 'Advanced';
-  if (val >= 55) return 'Proficient';
-  if (val >= 35) return 'Intermediate';
-  return 'Beginner';
-}
-function getSkillBars() {
-  const bars = [];
-  document.querySelectorAll('[id^="sbrow-"]').forEach(row => {
-    const id = row.id.replace('sbrow-', '');
-    const name = v(id + '-name');
-    const rangeEl = document.getElementById(id + '-range');
-    if (name && rangeEl) bars.push({ name, level: parseInt(rangeEl.value) });
-  });
-  return bars;
-}
-
-/* ── ENTRY CARDS ── */
-function makeCard(type, id, innerHtml, titleFn) {
-  const card = document.createElement('div');
-  card.className = 'entry-card';
-  card.dataset.type = type;
-  card.dataset.id = id;
-  card.innerHTML = `
-    <div class="ec-head" onclick="toggleCard(this)">
-      <span class="ec-drag">⠿</span>
-      <div class="ec-info">
-        <div class="ec-title" id="${id}-etitle">New entry</div>
-        <div class="ec-sub" id="${id}-esub">Click to expand</div>
-      </div>
-      <div class="ec-actions">
-        <button class="ic-btn del" title="Delete" onclick="event.stopPropagation();this.closest('.entry-card').remove();live();">✕</button>
-        <button class="ic-btn" title="Toggle">▾</button>
-      </div>
-    </div>
-    <div class="ec-body open">${innerHtml}</div>`;
-  card.querySelectorAll('input,textarea').forEach(el => {
-    el.addEventListener('input', () => { titleFn(id); live(); });
-  });
-  return card;
-}
-function toggleCard(head) { head.nextElementSibling.classList.toggle('open'); }
-
-function addExp(role='', company='', start='', end='', loc='', desc='') {
-  const id = 'exp' + (++expCount);
-  const inner = `
-    <div class="row2">
-      <div class="field"><label>Job Title</label><input id="${id}-role" value="${esc(role)}" placeholder="Frontend Developer"></div>
-      <div class="field"><label>Company</label><input id="${id}-company" value="${esc(company)}" placeholder="Google"></div>
-    </div>
-    <div class="row3">
-      <div class="field"><label>Start</label><input id="${id}-start" value="${esc(start)}" placeholder="Jun 2022"></div>
-      <div class="field"><label>End</label><input id="${id}-end" value="${esc(end)}" placeholder="Present"></div>
-      <div class="field"><label>Location</label><input id="${id}-loc" value="${esc(loc)}" placeholder="Remote"></div>
-    </div>
-    <div class="field">
-      <label>Responsibilities / Achievements</label>
-      <textarea id="${id}-desc" rows="4" placeholder="• Built React dashboard reducing page load by 40%&#10;• Led team of 3 engineers to deliver features 2 weeks ahead of schedule">${esc(desc)}</textarea>
-    </div>`;
-  const card = makeCard('exp', id, inner, id => {
-    const t = document.getElementById(id+'-etitle');
-    const s = document.getElementById(id+'-esub');
-    if (t) t.textContent = v(id+'-role') || 'New position';
-    if (s) s.textContent = v(id+'-company') || 'Company';
-  });
-  document.getElementById('exp-entries').appendChild(card);
-  live();
-}
-
-function addEdu(degree='', school='', year='', grade='') {
-  const id = 'edu' + (++eduCount);
-  const inner = `
-    <div class="row2">
-      <div class="field"><label>Degree / Course</label><input id="${id}-degree" value="${esc(degree)}" placeholder="B.Tech Computer Science"></div>
-      <div class="field"><label>Institution</label><input id="${id}-school" value="${esc(school)}" placeholder="IIT Bombay"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>Duration / Year</label><input id="${id}-year" value="${esc(year)}" placeholder="2018 – 2022"></div>
-      <div class="field"><label>GPA / Grade</label><input id="${id}-grade" value="${esc(grade)}" placeholder="9.1/10 | First Class"></div>
-    </div>`;
-  const card = makeCard('edu', id, inner, id => {
-    const t = document.getElementById(id+'-etitle');
-    const s = document.getElementById(id+'-esub');
-    if (t) t.textContent = v(id+'-degree') || 'Degree';
-    if (s) s.textContent = v(id+'-school') || 'Institution';
-  });
-  document.getElementById('edu-entries').appendChild(card);
-  live();
-}
-
-function addProj(name='', tech='', link='', desc='') {
-  const id = 'proj' + (++projCount);
-  const inner = `
-    <div class="row2">
-      <div class="field"><label>Project Name</label><input id="${id}-name" value="${esc(name)}" placeholder="AI Resume Builder"></div>
-      <div class="field"><label>Tech Stack</label><input id="${id}-tech" value="${esc(tech)}" placeholder="React, Node.js, MongoDB"></div>
-    </div>
-    <div class="field"><label>GitHub / Live URL</label><input id="${id}-link" value="${esc(link)}" placeholder="github.com/you/project"></div>
-    <div class="field">
-      <label>Description</label>
-      <textarea id="${id}-desc" rows="3" placeholder="Developed a full-stack AI-powered resume builder with live preview and PDF export.">${esc(desc)}</textarea>
-    </div>`;
-  const card = makeCard('proj', id, inner, id => {
-    const t = document.getElementById(id+'-etitle');
-    const s = document.getElementById(id+'-esub');
-    if (t) t.textContent = v(id+'-name') || 'New project';
-    if (s) s.textContent = v(id+'-tech') || 'Tech stack';
-  });
-  document.getElementById('proj-entries').appendChild(card);
-  live();
-}
-
-function addCert(name='', org='', year='') {
-  const id = 'cert' + (++certCount);
-  const inner = `
-    <div class="row2">
-      <div class="field"><label>Certification Name</label><input id="${id}-name" value="${esc(name)}" placeholder="AWS Solutions Architect"></div>
-      <div class="field"><label>Issuer</label><input id="${id}-org" value="${esc(org)}" placeholder="Amazon Web Services"></div>
-    </div>
-    <div class="field"><label>Year</label><input id="${id}-year" value="${esc(year)}" placeholder="2024"></div>`;
-  const card = makeCard('cert', id, inner, id => {
-    const t = document.getElementById(id+'-etitle');
-    const s = document.getElementById(id+'-esub');
-    if (t) t.textContent = v(id+'-name') || 'Certification';
-    if (s) s.textContent = v(id+'-org') || 'Issuer';
-  });
-  document.getElementById('cert-entries').appendChild(card);
-  live();
-}
-
-/* ── HTML SECTION BUILDERS ── */
-function getContactsHtml(sep='') {
-  const parts = [];
-  if (v('email'))    parts.push(`<span>✉ ${esc(v('email'))}</span>`);
-  if (v('phone'))    parts.push(`<span>📞 ${esc(v('phone'))}</span>`);
-  if (v('location')) parts.push(`<span>📍 ${esc(v('location'))}</span>`);
-  if (v('linkedin')) parts.push(`<span>in ${esc(v('linkedin'))}</span>`);
-  if (v('github'))   parts.push(`<span>⌥ ${esc(v('github'))}</span>`);
-  if (v('website'))  parts.push(`<span>🌐 ${esc(v('website'))}</span>`);
-  return parts.join(sep);
-}
-
-function getExpHtml() {
-  const cards = document.querySelectorAll('[data-type="exp"]');
-  if (!cards.length) return '';
-  let h = `<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Experience</span><span class="r-sec-line"></span></div>`;
-  cards.forEach(card => {
+// ========== ATS OPTIMIZER FUNCTIONS ==========
+function getAllResumeText() {
+  let text = '';
+  text += v('firstName') + ' ' + v('lastName') + ' ';
+  text += v('jobTitle') + ' ';
+  text += v('summary') + ' ';
+  text += v('extraSkills') + ' ';
+  
+  document.querySelectorAll('[data-type="exp"]').forEach(card => {
     const id = card.dataset.id;
-    const role = v(id+'-role'), company = v(id+'-company');
-    if (!role && !company) return;
-    const dateStr = (v(id+'-start') || v(id+'-end')) ? `${esc(v(id+'-start'))} – ${esc(v(id+'-end'))}` : '';
-    h += `<div class="r-entry"><div class="r-row"><span class="r-role">${esc(role)}</span><span class="r-date">${dateStr}</span></div>`;
-    if (company) h += `<div class="r-org">${esc(company)}${v(id+'-loc') ? ' · '+esc(v(id+'-loc')) : ''}</div>`;
-    if (v(id+'-desc')) h += `<div class="r-desc">${esc(v(id+'-desc'))}</div>`;
-    h += '</div>';
+    text += v(id+'-role') + ' ' + v(id+'-company') + ' ' + v(id+'-desc') + ' ';
   });
-  return h + '</div>';
-}
-
-function getEduHtml() {
-  const cards = document.querySelectorAll('[data-type="edu"]');
-  if (!cards.length) return '';
-  let h = `<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Education</span><span class="r-sec-line"></span></div>`;
-  cards.forEach(card => {
+  
+  document.querySelectorAll('[data-type="proj"]').forEach(card => {
     const id = card.dataset.id;
-    const degree = v(id+'-degree'), school = v(id+'-school');
-    if (!degree && !school) return;
-    h += `<div class="r-entry"><div class="r-row"><span class="r-role">${esc(degree)}</span><span class="r-date">${esc(v(id+'-year'))}</span></div>`;
-    if (school) h += `<div class="r-org">${esc(school)}${v(id+'-grade') ? ' · '+esc(v(id+'-grade')) : ''}</div>`;
-    h += '</div>';
+    text += v(id+'-name') + ' ' + v(id+'-tech') + ' ' + v(id+'-desc') + ' ';
   });
-  return h + '</div>';
+  
+  getSkillBars().forEach(skill => { text += skill.name + ' '; });
+  
+  return text.toLowerCase();
 }
 
-function getProjHtml() {
-  if (hiddenSections.has('projects')) return '';
-  const cards = document.querySelectorAll('[data-type="proj"]');
-  if (!cards.length) return '';
-  let h = `<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Projects</span><span class="r-sec-line"></span></div>`;
-  cards.forEach(card => {
-    const id = card.dataset.id;
-    const name = v(id+'-name');
-    if (!name) return;
-    h += `<div class="r-entry"><div class="r-row"><span class="r-role">${esc(name)}</span>${v(id+'-link') ? `<span class="r-date">${esc(v(id+'-link'))}</span>` : ''}</div>`;
-    if (v(id+'-tech')) h += `<div class="r-org">${esc(v(id+'-tech'))}</div>`;
-    if (v(id+'-desc')) h += `<div class="r-desc">${esc(v(id+'-desc'))}</div>`;
-    h += '</div>';
-  });
-  return h + '</div>';
-}
-
-function getCertHtml() {
-  if (hiddenSections.has('certifications')) return '';
-  const cards = document.querySelectorAll('[data-type="cert"]');
-  if (!cards.length) return '';
-  let h = `<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Certifications</span><span class="r-sec-line"></span></div>`;
-  cards.forEach(card => {
-    const id = card.dataset.id;
-    const name = v(id+'-name');
-    if (!name) return;
-    h += `<div class="r-entry"><div class="r-row"><span class="r-role">${esc(name)}</span><span class="r-date">${esc(v(id+'-year'))}</span></div>`;
-    if (v(id+'-org')) h += `<div class="r-org">${esc(v(id+'-org'))}</div>`;
-    h += '</div>';
-  });
-  return h + '</div>';
-}
-
-function getSkillsMainHtml() {
-  const bars = getSkillBars();
-  const extra = v('extraSkills').split(',').map(s=>s.trim()).filter(Boolean);
-  const langs = v('languages');
-  let h = '';
-  if (showSkillBars && bars.length) {
-    h += `<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Skills</span><span class="r-sec-line"></span></div>`;
-    bars.forEach(b => {
-      h += `<div class="r-skill-bar-row"><span class="r-skill-bar-name">${esc(b.name)}</span><div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div></div>`;
-    });
-    h += '</div>';
-  }
-  if (extra.length) {
-    const heading = (!showSkillBars || !bars.length) ? '<div class="r-sec-head"><span class="r-sec-title">Skills</span><span class="r-sec-line"></span></div>' : '';
-    h += `<div class="r-section">${heading}<div class="r-skill-tags">${extra.map(s=>`<span class="r-skill-tag">${esc(s)}</span>`).join('')}</div></div>`;
-  }
-  if (langs) {
-    h += `<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Languages</span><span class="r-sec-line"></span></div><div class="r-summary-text">${esc(langs)}</div></div>`;
-  }
-  return h;
-}
-
-/* ── RENDERERS ── */
-function renderResume() {
-  const paper = document.getElementById('resume-paper');
-  paper.className = 'resume-paper tmpl-' + currentTemplate;
-  if (currentTemplate === 'professional') renderProfessional(paper);
-  else if (currentTemplate === 'minimal') renderMinimal(paper);
-  else renderModern(paper);
-}
-
-function renderModern(paper) {
-  const name = [v('firstName'), v('lastName')].filter(Boolean).join(' ') || 'Your Name';
-  let html = `<div class="r-accent-bar"></div><div class="r-body">
-    <div class="r-name">${esc(name)}</div>
-    ${v('jobTitle') ? `<div class="r-jobtitle">${esc(v('jobTitle'))}</div>` : ''}
-    <div class="r-contacts">${getContactsHtml()}</div>`;
-  if (v('summary')) html += `<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Summary</span><span class="r-sec-line"></span></div><div class="r-summary-text">${esc(v('summary'))}</div></div>`;
-  html += getExpHtml() + getEduHtml() + getProjHtml() + getCertHtml() + getSkillsMainHtml() + '</div>';
-  paper.innerHTML = html;
-}
-
-function renderMinimal(paper) {
-  const name = [v('firstName'), v('lastName')].filter(Boolean).join(' ') || 'Your Name';
-  let html = `<div class="r-body">
-    <div class="r-name">${esc(name)}</div>
-    ${v('jobTitle') ? `<div class="r-jobtitle">${esc(v('jobTitle'))}</div>` : ''}
-    <div class="r-contacts">${getContactsHtml()}</div>`;
-  if (v('summary')) html += `<div class="r-section"><div class="r-sec-title">About</div><div class="r-summary-text">${esc(v('summary'))}</div></div>`;
-  html += getExpHtml() + getEduHtml() + getProjHtml() + getCertHtml() + getSkillsMainHtml() + '</div>';
-  paper.innerHTML = html;
-}
-
-function renderProfessional(paper) {
-  const name = [v('firstName'), v('lastName')].filter(Boolean).join(' ') || 'Your Name';
-  const bars = getSkillBars();
-  const extra = v('extraSkills').split(',').map(s=>s.trim()).filter(Boolean);
-  let sidebar = `<div class="r-sidebar">
-    <div class="r-name">${esc(name)}</div>
-    ${v('jobTitle') ? `<div class="r-jobtitle">${esc(v('jobTitle'))}</div>` : ''}
-    <div class="r-contacts">${getContactsHtml('<br>')}</div>`;
-  if (v('summary')) sidebar += `<div class="r-sidebar-sec-title">About</div><div class="r-sidebar-text">${esc(v('summary'))}</div>`;
-  if (showSkillBars && bars.length) {
-    sidebar += `<div class="r-sidebar-sec-title">Skills</div>`;
-    bars.forEach(b => {
-      sidebar += `<div class="r-skill-bar-row"><span class="r-skill-bar-name">${esc(b.name)}</span><div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div></div>`;
-    });
-  }
-  if (extra.length) sidebar += `<div class="r-sidebar-sec-title">Tools</div><div class="r-skill-tags">${extra.map(s=>`<span class="r-skill-tag">${esc(s)}</span>`).join('')}</div>`;
-  if (v('languages')) sidebar += `<div class="r-sidebar-sec-title">Languages</div><div class="r-sidebar-text">${esc(v('languages'))}</div>`;
-  sidebar += '</div>';
-  paper.innerHTML = sidebar + `<div class="r-main">${getExpHtml()}${getEduHtml()}${getProjHtml()}${getCertHtml()}</div>`;
-}
-
-/* ── TEMPLATE SWITCHER ── */
-function setTemplate(name, btn) {
-  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  currentTemplate = name;
-  live();
-  showToast('Template switched to ' + name.charAt(0).toUpperCase() + name.slice(1));
-}
-
-/* ── SCORE ── */
-function updateScore() {
-  const checks = [
-    !!v('firstName'), !!v('email'), !!v('jobTitle'), !!v('phone'),
-    v('summary').length > 30,
-    document.querySelectorAll('[data-type="exp"]').length > 0,
-    document.querySelectorAll('[data-type="edu"]').length > 0,
-    !!(v('extraSkills') || getSkillBars().length)
-  ];
-  const score = Math.round(checks.filter(Boolean).length / checks.length * 100);
-  document.getElementById('score-num').textContent = score + '%';
-  const navChecks = {
-    basics:         !!(v('firstName') && v('email')),
-    summary:        v('summary').length > 20,
-    experience:     document.querySelectorAll('[data-type="exp"]').length > 0,
-    education:      document.querySelectorAll('[data-type="edu"]').length > 0,
-    skills:         !!(v('extraSkills') || getSkillBars().length),
-    projects:       document.querySelectorAll('[data-type="proj"]').length > 0,
-    certifications: document.querySelectorAll('[data-type="cert"]').length > 0
-  };
-  Object.entries(navChecks).forEach(([sec, done]) => {
-    const nav = document.getElementById('nav-' + sec);
-    if (nav) nav.classList.toggle('done', !!done);
-  });
-}
-
-/* ── PDF EXPORT (FIXED) ── */
-function exportPDF() {
-  const loading = document.getElementById('export-loading');
-  loading.classList.add('show');
-
-  const element = document.getElementById('resume-paper');
-  const prevBoxShadow = element.style.boxShadow;
-  const prevBorderRadius = element.style.borderRadius;
-  element.style.boxShadow = 'none';
-  element.style.borderRadius = '0';
-
-  const filename = (v('firstName') || 'resume') + '_resume.pdf';
-
-  const opt = {
-    margin:      [0, 0, 0, 0],
-    filename:    filename,
-    image:       { type: 'jpeg', quality: 0.99 },
-    html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0, backgroundColor: '#ffffff' },
-    jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  requestAnimationFrame(() => {
-    html2pdf().set(opt).from(element).save()
-      .then(() => {
-        element.style.boxShadow = prevBoxShadow;
-        element.style.borderRadius = prevBorderRadius;
-        loading.classList.remove('show');
-        showToast('PDF downloaded!', 'success');
-      })
-      .catch(err => {
-        console.error('PDF export error:', err);
-        element.style.boxShadow = prevBoxShadow;
-        element.style.borderRadius = prevBorderRadius;
-        loading.classList.remove('show');
-        showToast('Export failed. Try again.', 'error');
-      });
-  });
-}
-
-/* ── AI SUGGESTIONS ── */
-const SUMMARY_TEMPLATES = [
-  (role, skills) => `Results-driven ${role || 'professional'} with hands-on experience building scalable solutions. Proficient in ${skills || 'modern technologies'} with a strong focus on clean code and performance optimization. Adept at collaborating in agile teams to ship impactful features.`,
-  (role, skills) => `Passionate ${role || 'developer'} skilled in ${skills || 'full-stack development'}, delivering end-to-end solutions from ideation to deployment. Known for strong problem-solving ability and a commitment to writing maintainable, well-documented code. Excited to contribute to high-impact products.`
-];
-const BULLET_TEMPLATES = [
-  input => `• Developed and deployed ${input}, reducing manual effort by 35% and improving team productivity`,
-  input => `• Designed and implemented ${input}, resulting in a 25% improvement in application performance and scalability`
-];
-const PROJECT_TEMPLATES = [
-  input => `Engineered ${input} from scratch using modern web technologies. Implemented user authentication, real-time data sync, and a responsive UI. Deployed on cloud infrastructure and used by 100+ users.`,
-  input => `Built ${input} as a full-stack application with clean architecture and RESTful API design. Features include dynamic filtering, search, and offline support. Open-sourced with 50+ GitHub stars.`
-];
-
-function renderSuggestions(containerId, suggestions, onUse) {
-  const box = document.getElementById(containerId);
-  if (!box) return;
-  box.innerHTML = suggestions.map((text, i) => `
-    <div class="ai-suggestion" onclick="useSuggestion('${containerId}',${i})">
-      <span style="flex:1">${esc(text)}</span>
-      <span class="use-btn">USE ↗</span>
-    </div>`).join('');
-  box._suggestions = suggestions;
-  box._onUse = onUse;
-}
-function useSuggestion(containerId, idx) {
-  const box = document.getElementById(containerId);
-  if (!box || !box._suggestions) return;
-  if (box._onUse) box._onUse(box._suggestions[idx]);
-}
-
-async function suggestSummary() {
-  const input = v('summary-ai-input') || `${v('jobTitle')} with skills in ${v('extraSkills')}`;
-  const role = v('jobTitle') || input;
-  const skills = v('extraSkills') || input;
-  const key = v('openai-key');
-  if (key) { await openAISuggest('summary', input, key); return; }
-  renderSuggestions('summary-suggestions', SUMMARY_TEMPLATES.map(fn => fn(role, skills)), text => {
-    document.getElementById('summary').value = text; live(); showToast('Summary applied!', 'success');
-  });
-}
-
-async function suggestBullets() {
-  const input = v('bullet-ai-input');
-  if (!input) { showToast('Enter a brief description first.'); return; }
-  const key = v('openai-key');
-  if (key) { await openAISuggest('bullets', input, key); return; }
-  renderSuggestions('bullet-suggestions', BULLET_TEMPLATES.map(fn => fn(input)), text => {
-    const tas = document.querySelectorAll('[id$="-desc"][id*="exp"]');
-    if (tas.length) { const last = tas[tas.length-1]; last.value = (last.value ? last.value+'\n':'') + text; live(); showToast('Bullet added!','success'); }
-    else showToast('Add an experience entry first.');
-  });
-}
-
-async function suggestProject() {
-  const input = v('proj-ai-input');
-  if (!input) { showToast('Enter a project description first.'); return; }
-  const key = v('openai-key');
-  if (key) { await openAISuggest('project', input, key); return; }
-  renderSuggestions('proj-suggestions', PROJECT_TEMPLATES.map(fn => fn(input)), text => {
-    const tas = document.querySelectorAll('[id$="-desc"][id*="proj"]');
-    if (tas.length) { tas[tas.length-1].value = text; live(); showToast('Applied!','success'); }
-    else showToast('Add a project entry first.');
-  });
-}
-
-async function openAISuggest(type, input, key) {
-  const prompts = {
-    summary: `Generate 2 concise resume professional summaries for a "${input}". Each 2-3 sentences. Return only a JSON array of 2 strings.`,
-    bullets: `Generate 2 strong resume bullet points for: "${input}". Start with action verbs, include metrics. Return only a JSON array of 2 strings.`,
-    project: `Generate 2 compelling project descriptions (2-3 sentences) for: "${input}". Return only a JSON array of 2 strings.`
-  };
-  const containerId = type === 'summary' ? 'summary-suggestions' : type === 'bullets' ? 'bullet-suggestions' : 'proj-suggestions';
-  const box = document.getElementById(containerId);
-  if (box) box.innerHTML = `<div style="text-align:center;padding:12px;color:var(--text3);font-size:12px"><span class="ai-spinner"></span> Generating with GPT-4…</div>`;
-  try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-      body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompts[type] }], max_tokens: 400 })
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const suggestions = JSON.parse(data.choices[0].message.content.trim());
-    if (type === 'summary') {
-      renderSuggestions(containerId, suggestions, t => { document.getElementById('summary').value = t; live(); showToast('Summary applied!','success'); });
-    } else if (type === 'bullets') {
-      renderSuggestions(containerId, suggestions, t => {
-        const tas = document.querySelectorAll('[id$="-desc"][id*="exp"]');
-        if (tas.length) { const l = tas[tas.length-1]; l.value = (l.value ? l.value+'\n':'')+t; live(); showToast('Added!','success'); }
-      });
-    } else {
-      renderSuggestions(containerId, suggestions, t => {
-        const tas = document.querySelectorAll('[id$="-desc"][id*="proj"]');
-        if (tas.length) { tas[tas.length-1].value = t; live(); showToast('Applied!','success'); }
-      });
+function extractKeywords(jobDesc) {
+  const words = jobDesc.toLowerCase().split(/[\s,.;:!?()\[\]{}"']+/);
+  const stopWords = new Set(['the','a','an','and','or','but','for','of','to','in','on','at','with','by','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','will','would','could','should','may','might','must','can','this','that','these','those','it','they','we','you','he','she','it','them','their','our','your','his','her','its','some','any','no','very','just','but','not','so','as','like','such','into','through','during','before','after','above','below','between','under','over','etc','e.g','i.e']);
+  
+  const keywordMap = new Map();
+  for (let word of words) {
+    if (word.length > 2 && !stopWords.has(word)) {
+      keywordMap.set(word, (keywordMap.get(word) || 0) + 1);
     }
-  } catch(e) {
-    if (box) box.innerHTML = `<div style="color:var(--red);font-size:12px;padding:10px">API Error: ${esc(e.message)}</div>`;
+  }
+  
+  const sorted = Array.from(keywordMap.entries()).sort((a,b) => b[1] - a[1]);
+  return sorted.slice(0, 30).map(k => k[0]);
+}
+
+function analyzeATS() {
+  const jobDesc = document.getElementById('jobDescription').value.trim();
+  if (!jobDesc) {
+    showToast('Please paste a job description first', 'error');
+    return;
+  }
+  
+  const resumeText = getAllResumeText();
+  const keywords = extractKeywords(jobDesc);
+  
+  const present = [];
+  const missing = [];
+  
+  for (let kw of keywords) {
+    if (resumeText.includes(kw)) {
+      present.push(kw);
+    } else {
+      missing.push(kw);
+    }
+  }
+  
+  currentKeywords = { present, missing };
+  
+  const presentPercent = (present.length / keywords.length) * 100;
+  const atsScore = Math.round(presentPercent * 0.7 + 30);
+  currentATSScore = Math.min(100, atsScore);
+  
+  updateATSUI(jobDesc);
+  showToast(`ATS Analysis Complete! Score: ${currentATSScore}/100`, 'success');
+}
+
+function updateATSUI(jobDesc) {
+  const circle = document.getElementById('atsScoreCircle');
+  const angle = (currentATSScore / 100) * 360;
+  circle.style.background = `conic-gradient(var(--gold) 0deg ${angle}deg, var(--bdr2) ${angle}deg 360deg)`;
+  document.getElementById('atsScoreNumber').innerText = currentATSScore;
+  
+  let scoreClass = 'good';
+  if (currentATSScore < 50) scoreClass = 'bad';
+  else if (currentATSScore < 70) scoreClass = 'warning';
+  
+  const metricsHtml = `
+    <div class="ats-metric"><span class="ats-metric-label">Keyword Match Rate</span><span class="ats-metric-value ${scoreClass}">${Math.round((currentKeywords.present.length / (currentKeywords.present.length + currentKeywords.missing.length)) * 100)}%</span></div>
+    <div class="ats-metric"><span class="ats-metric-label">Keywords Found</span><span class="ats-metric-value good">${currentKeywords.present.length}</span></div>
+    <div class="ats-metric"><span class="ats-metric-label">Missing Keywords</span><span class="ats-metric-value bad">${currentKeywords.missing.length}</span></div>
+    <div class="ats-metric"><span class="ats-metric-label">Resume Length</span><span class="ats-metric-value">${getAllResumeText().split(' ').length} words</span></div>
+  `;
+  document.getElementById('atsMetrics').innerHTML = metricsHtml;
+  
+  const keywordHtml = `
+    <div style="margin-bottom:12px"><strong>✅ Keywords Present (${currentKeywords.present.length})</strong><br>
+    ${currentKeywords.present.slice(0,15).map(k => `<span class="ats-keyword-tag">${k}</span>`).join('')}
+    ${currentKeywords.present.length > 15 ? `<span class="ats-keyword-tag">+${currentKeywords.present.length-15} more</span>` : ''}
+    </div>
+    <div><strong>❌ Missing Keywords (${currentKeywords.missing.length})</strong><br>
+    ${currentKeywords.missing.slice(0,15).map(k => `<span class="ats-keyword-tag missing">${k}</span>`).join('')}
+    ${currentKeywords.missing.length > 15 ? `<span class="ats-keyword-tag missing">+${currentKeywords.missing.length-15} more</span>` : ''}
+    </div>
+  `;
+  document.getElementById('keywordAnalysis').innerHTML = keywordHtml;
+  
+  const suggestions = [];
+  if (currentATSScore < 50) {
+    suggestions.push({ type: 'warning', text: '⚠️ Your resume needs significant improvement. Focus on adding relevant keywords from the job description.' });
+  } else if (currentATSScore < 70) {
+    suggestions.push({ type: 'warning', text: '⚠️ Moderate match. Add missing keywords to your skills section and experience descriptions.' });
+  } else {
+    suggestions.push({ type: 'good', text: '✅ Great match! Your resume aligns well with the job description.' });
+  }
+  
+  if (currentKeywords.missing.length > 0) {
+    suggestions.push({ type: 'suggestion', text: `💡 Add these keywords to your resume: ${currentKeywords.missing.slice(0,8).join(', ')}` });
+  }
+  
+  if (getAllResumeText().split(' ').length < 300) {
+    suggestions.push({ type: 'suggestion', text: '📝 Your resume is quite short. Add more details to your experience and projects sections.' });
+  }
+  
+  if (!v('summary')) {
+    suggestions.push({ type: 'suggestion', text: '✏️ Add a professional summary to improve ATS compatibility.' });
+  }
+  
+  if (getSkillBars().length === 0 && !v('extraSkills')) {
+    suggestions.push({ type: 'suggestion', text: '⚡ Add a skills section with relevant technologies and tools.' });
+  }
+  
+  const suggestionsHtml = suggestions.map(s => `<div class="${s.type === 'warning' ? 'ats-warning' : 'ats-suggestion'}">${s.text}</div>`).join('');
+  document.getElementById('atsSuggestions').innerHTML = suggestionsHtml || '<div class="ats-suggestion">✨ Your resume looks great! Keep up the good work.</div>';
+}
+
+function updateATSScore() {
+  if (document.getElementById('jobDescription') && document.getElementById('jobDescription').value.trim()) {
+    analyzeATS();
   }
 }
 
-/* ── TOAST ── */
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' '+type : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
-}
+// ========== EXISTING RESUME FUNCTIONS ==========
+function addSkillBar(name='',level=70){const id='sb'+(++sbCount);const wrap=document.getElementById('skill-bar-list');const row=document.createElement('div');row.className='skill-bar-item';row.id='sbrow-'+id;row.innerHTML=`<input type="text" id="${id}-name" placeholder="JavaScript" value="${esc(name)}" oninput="live(); updateATSScore()"><span class="skill-level-label" id="${id}-label">${getLevelLabel(level)}</span><input type="range" class="skill-range" id="${id}-range" min="10" max="100" value="${level}" style="--val:${level}%" oninput="updateSkillBar('${id}',this)"><button class="ic-btn del" onclick="document.getElementById('sbrow-${id}').remove();live();updateATSScore();">✕</button>`;wrap.appendChild(row);live();}
+function updateSkillBar(id,input){input.style.setProperty('--val',input.value+'%');const lbl=document.getElementById(id+'-label');if(lbl)lbl.textContent=getLevelLabel(parseInt(input.value));live();}
+function getLevelLabel(val){if(val>=90)return'Expert';if(val>=75)return'Advanced';if(val>=55)return'Proficient';if(val>=35)return'Intermediate';return'Beginner';}
+function getSkillBars(){const bars=[];document.querySelectorAll('[id^="sbrow-"]').forEach(row=>{const id=row.id.replace('sbrow-','');const name=v(id+'-name');const rangeEl=document.getElementById(id+'-range');if(name&&rangeEl)bars.push({name,level:parseInt(rangeEl.value)});});return bars;}
+function makeCard(type,id,innerHtml,titleFn){const card=document.createElement('div');card.className='entry-card';card.dataset.type=type;card.dataset.id=id;card.innerHTML=`<div class="ec-head" onclick="toggleCard(this)"><span class="ec-drag">⠿</span><div class="ec-info"><div class="ec-title" id="${id}-etitle">New entry</div><div class="ec-sub" id="${id}-esub">Click to expand</div></div><div class="ec-actions"><button class="ic-btn del" title="Delete" onclick="event.stopPropagation();this.closest('.entry-card').remove();live();updateATSScore();">✕</button><button class="ic-btn" title="Toggle">▾</button></div></div><div class="ec-body open">${innerHtml}</div>`;card.querySelectorAll('input,textarea').forEach(el=>{el.addEventListener('input',()=>{titleFn(id);live();updateATSScore();});});return card;}
+function toggleCard(head){head.nextElementSibling.classList.toggle('open');}
+function addExp(role='',company='',start='',end='',loc='',desc=''){const id='exp'+(++expCount);const inner=`<div class="row2"><div class="field"><label>Job Title</label><input id="${id}-role" value="${esc(role)}" placeholder="Frontend Developer" oninput="updateATSScore()"></div><div class="field"><label>Company</label><input id="${id}-company" value="${esc(company)}" placeholder="Google" oninput="updateATSScore()"></div></div><div class="row3"><div class="field"><label>Start</label><input id="${id}-start" value="${esc(start)}" placeholder="Jun 2022"></div><div class="field"><label>End</label><input id="${id}-end" value="${esc(end)}" placeholder="Present"></div><div class="field"><label>Location</label><input id="${id}-loc" value="${esc(loc)}" placeholder="Remote"></div></div><div class="field"><label>Responsibilities</label><textarea id="${id}-desc" rows="4" placeholder="• Built React dashboard..." oninput="updateATSScore()">${esc(desc)}</textarea></div>`;const card=makeCard('exp',id,inner,id=>{const t=document.getElementById(id+'-etitle');const s=document.getElementById(id+'-esub');if(t)t.textContent=v(id+'-role')||'New position';if(s)s.textContent=v(id+'-company')||'Company';});document.getElementById('exp-entries').appendChild(card);live();}
+function addEdu(degree='',school='',year='',grade=''){const id='edu'+(++eduCount);const inner=`<div class="row2"><div class="field"><label>Degree</label><input id="${id}-degree" value="${esc(degree)}" placeholder="B.Tech CS"></div><div class="field"><label>Institution</label><input id="${id}-school" value="${esc(school)}" placeholder="IIT Bombay"></div></div><div class="row2"><div class="field"><label>Year</label><input id="${id}-year" value="${esc(year)}" placeholder="2018–2022"></div><div class="field"><label>GPA</label><input id="${id}-grade" value="${esc(grade)}" placeholder="9.1/10"></div></div>`;const card=makeCard('edu',id,inner,id=>{const t=document.getElementById(id+'-etitle');const s=document.getElementById(id+'-esub');if(t)t.textContent=v(id+'-degree')||'Degree';if(s)s.textContent=v(id+'-school')||'Institution';});document.getElementById('edu-entries').appendChild(card);live();}
+function addProj(name='',tech='',link='',desc=''){const id='proj'+(++projCount);const inner=`<div class="row2"><div class="field"><label>Project Name</label><input id="${id}-name" value="${esc(name)}" placeholder="AI Resume Builder" oninput="updateATSScore()"></div><div class="field"><label>Tech Stack</label><input id="${id}-tech" value="${esc(tech)}" placeholder="React, Node.js" oninput="updateATSScore()"></div></div><div class="field"><label>URL</label><input id="${id}-link" value="${esc(link)}" placeholder="github.com/you/project"></div><div class="field"><label>Description</label><textarea id="${id}-desc" rows="3" placeholder="Developed a full-stack..." oninput="updateATSScore()">${esc(desc)}</textarea></div>`;const card=makeCard('proj',id,inner,id=>{const t=document.getElementById(id+'-etitle');const s=document.getElementById(id+'-esub');if(t)t.textContent=v(id+'-name')||'New project';if(s)s.textContent=v(id+'-tech')||'Tech stack';});document.getElementById('proj-entries').appendChild(card);live();}
+function addCert(name='',org='',year=''){const id='cert'+(++certCount);const inner=`<div class="row2"><div class="field"><label>Certification</label><input id="${id}-name" value="${esc(name)}" placeholder="AWS Certified"></div><div class="field"><label>Issuer</label><input id="${id}-org" value="${esc(org)}" placeholder="Amazon"></div></div><div class="field"><label>Year</label><input id="${id}-year" value="${esc(year)}" placeholder="2024"></div>`;const card=makeCard('cert',id,inner,id=>{const t=document.getElementById(id+'-etitle');const s=document.getElementById(id+'-esub');if(t)t.textContent=v(id+'-name')||'Certification';if(s)s.textContent=v(id+'-org')||'Issuer';});document.getElementById('cert-entries').appendChild(card);live();}
+function getContactsHtml(sep=''){const parts=[];if(v('email'))parts.push(`<span>✉ ${esc(v('email'))}</span>`);if(v('phone'))parts.push(`<span>📞 ${esc(v('phone'))}</span>`);if(v('location'))parts.push(`<span>📍 ${esc(v('location'))}</span>`);if(v('linkedin'))parts.push(`<span>in ${esc(v('linkedin'))}</span>`);if(v('github'))parts.push(`<span>⌥ ${esc(v('github'))}</span>`);if(v('website'))parts.push(`<span>🌐 ${esc(v('website'))}</span>`);return parts.join(sep);}
+function getExpHtml(){const cards=document.querySelectorAll('[data-type="exp"]');if(!cards.length)return '';let h=`<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Experience</span><span class="r-sec-line"></span></div>`;cards.forEach(card=>{const id=card.dataset.id;const role=v(id+'-role'),company=v(id+'-company');if(!role&&!company)return;const dateStr=(v(id+'-start')||v(id+'-end'))?`${esc(v(id+'-start'))} – ${esc(v(id+'-end'))}`:'';h+=`<div class="r-entry"><div class="r-row"><span class="r-role">${esc(role)}</span><span class="r-date">${dateStr}</span></div>`;if(company)h+=`<div class="r-org">${esc(company)}${v(id+'-loc')?' · '+esc(v(id+'-loc')):''}</div>`;if(v(id+'-desc'))h+=`<div class="r-desc">${esc(v(id+'-desc'))}</div>`;h+='</div>';});return h+'</div>';}
+function getEduHtml(){const cards=document.querySelectorAll('[data-type="edu"]');if(!cards.length)return '';let h=`<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Education</span><span class="r-sec-line"></span></div>`;cards.forEach(card=>{const id=card.dataset.id;const degree=v(id+'-degree'),school=v(id+'-school');if(!degree&&!school)return;h+=`<div class="r-entry"><div class="r-row"><span class="r-role">${esc(degree)}</span><span class="r-date">${esc(v(id+'-year'))}</span></div>`;if(school)h+=`<div class="r-org">${esc(school)}${v(id+'-grade')?' · '+esc(v(id+'-grade')):''}</div>`;h+='</div>';});return h+'</div>';}
+function getProjHtml(){if(hiddenSections.has('projects'))return '';const cards=document.querySelectorAll('[data-type="proj"]');if(!cards.length)return '';let h=`<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Projects</span><span class="r-sec-line"></span></div>`;cards.forEach(card=>{const id=card.dataset.id;const name=v(id+'-name');if(!name)return;h+=`<div class="r-entry"><div class="r-row"><span class="r-role">${esc(name)}</span>${v(id+'-link')?`<span class="r-date">${esc(v(id+'-link'))}</span>`:''}</div>`;if(v(id+'-tech'))h+=`<div class="r-org">${esc(v(id+'-tech'))}</div>`;if(v(id+'-desc'))h+=`<div class="r-desc">${esc(v(id+'-desc'))}</div>`;h+='</div>';});return h+'</div>';}
+function getCertHtml(){if(hiddenSections.has('certifications'))return '';const cards=document.querySelectorAll('[data-type="cert"]');if(!cards.length)return '';let h=`<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Certifications</span><span class="r-sec-line"></span></div>`;cards.forEach(card=>{const id=card.dataset.id;const name=v(id+'-name');if(!name)return;h+=`<div class="r-entry"><div class="r-row"><span class="r-role">${esc(name)}</span><span class="r-date">${esc(v(id+'-year'))}</span></div>`;if(v(id+'-org'))h+=`<div class="r-org">${esc(v(id+'-org'))}</div>`;h+='</div>';});return h+'</div>';}
+function getSkillsMainHtml(){const bars=getSkillBars();const extra=v('extraSkills').split(',').map(s=>s.trim()).filter(Boolean);const langs=v('languages');let h='';if(showSkillBars&&bars.length){h+=`<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Skills</span><span class="r-sec-line"></span></div>`;bars.forEach(b=>{h+=`<div class="r-skill-bar-row"><span class="r-skill-bar-name">${esc(b.name)}</span><div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div></div>`;});h+='</div>';}if(extra.length){const heading=(!showSkillBars||!bars.length)?'<div class="r-sec-head"><span class="r-sec-title">Skills</span><span class="r-sec-line"></span></div>':'';h+=`<div class="r-section">${heading}<div class="r-skill-tags">${extra.map(s=>`<span class="r-skill-tag">${esc(s)}</span>`).join('')}</div></div>`;}if(langs){h+=`<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Languages</span><span class="r-sec-line"></span></div><div class="r-summary-text">${esc(langs)}</div></div>`;}return h;}
+function renderResume(){const paper=document.getElementById('resume-paper');paper.className='resume-paper tmpl-'+currentTemplate;const name=[v('firstName'),v('lastName')].filter(Boolean).join(' ')||'Your Name';if(currentTemplate==='professional'){let sidebar=`<div class="r-sidebar"><div class="r-name">${esc(name)}</div>${v('jobTitle')?`<div class="r-jobtitle">${esc(v('jobTitle'))}</div>`:''}<div class="r-contacts">${getContactsHtml('<br>')}</div>`;if(v('summary'))sidebar+=`<div class="r-sidebar-sec-title">About</div><div class="r-sidebar-text">${esc(v('summary'))}</div>`;const bars=getSkillBars();if(showSkillBars&&bars.length){sidebar+=`<div class="r-sidebar-sec-title">Skills</div>`;bars.forEach(b=>{sidebar+=`<div class="r-skill-bar-row"><span class="r-skill-bar-name">${esc(b.name)}</span><div class="r-skill-bar-track"><div class="r-skill-bar-fill" style="width:${b.level}%"></div></div></div>`;});}sidebar+='</div>';paper.innerHTML=sidebar+`<div class="r-main">${getExpHtml()}${getEduHtml()}${getProjHtml()}${getCertHtml()}</div>`;}else if(currentTemplate==='minimal'){paper.innerHTML=`<div class="r-body"><div class="r-name">${esc(name)}</div>${v('jobTitle')?`<div class="r-jobtitle">${esc(v('jobTitle'))}</div>`:''}<div class="r-contacts">${getContactsHtml()}</div>${v('summary')?`<div class="r-section"><div class="r-sec-title">About</div><div class="r-summary-text">${esc(v('summary'))}</div></div>`:''}${getExpHtml()}${getEduHtml()}${getProjHtml()}${getCertHtml()}${getSkillsMainHtml()}</div>`;}else{paper.innerHTML=`<div class="r-accent-bar"></div><div class="r-body"><div class="r-name">${esc(name)}</div>${v('jobTitle')?`<div class="r-jobtitle">${esc(v('jobTitle'))}</div>`:''}<div class="r-contacts">${getContactsHtml()}</div>${v('summary')?`<div class="r-section"><div class="r-sec-head"><span class="r-sec-title">Summary</span><span class="r-sec-line"></span></div><div class="r-summary-text">${esc(v('summary'))}</div></div>`:''}${getExpHtml()}${getEduHtml()}${getProjHtml()}${getCertHtml()}${getSkillsMainHtml()}</div>`;}}
+function updateScore(){if(!currentUser)return;const checks=[!!v('firstName'),!!v('email'),!!v('jobTitle'),!!v('phone'),v('summary').length>30,document.querySelectorAll('[data-type="exp"]').length>0,document.querySelectorAll('[data-type="edu"]').length>0,!!(v('extraSkills')||getSkillBars().length)];const score=Math.round(checks.filter(Boolean).length/checks.length*100);document.getElementById('score-num').textContent=score+'%';const navChecks={basics:!!(v('firstName')&&v('email')),summary:v('summary').length>20,experience:document.querySelectorAll('[data-type="exp"]').length>0,education:document.querySelectorAll('[data-type="edu"]').length>0,skills:!!(v('extraSkills')||getSkillBars().length),projects:document.querySelectorAll('[data-type="proj"]').length>0,certifications:document.querySelectorAll('[data-type="cert"]').length>0};Object.entries(navChecks).forEach(([sec,done])=>{const nav=document.getElementById('nav-'+sec);if(nav)nav.classList.toggle('done',!!done);});}
+function setTemplate(name,btn){document.querySelectorAll('.tpl-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');currentTemplate=name;live();showToast('Template switched to '+name.charAt(0).toUpperCase()+name.slice(1));}
+function exportPDF(){const loading=document.getElementById('export-loading');loading.classList.add('show');const element=document.getElementById('resume-paper');const prevBoxShadow=element.style.boxShadow;element.style.boxShadow='none';html2pdf().set({margin:[0,0,0,0],filename:(v('firstName')||'resume')+'_resume.pdf',image:{type:'jpeg',quality:0.99},html2canvas:{scale:2,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(element).save().then(()=>{element.style.boxShadow=prevBoxShadow;loading.classList.remove('show');showToast('PDF downloaded!','success');}).catch(()=>{element.style.boxShadow=prevBoxShadow;loading.classList.remove('show');showToast('Export failed.','error');});}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);}
 
-/* ── INIT — this must be last, runs on page load ── */
-live();
+// AI Suggestion Functions (same as original)
+const SUMMARY_TEMPLATES=[(role,skills)=>`Results-driven ${role||'professional'} with hands-on experience. Proficient in ${skills||'modern technologies'}. Adept at agile collaboration.`,(role,skills)=>`Passionate ${role||'developer'} skilled in ${skills||'full-stack development'}, delivering end-to-end solutions. Committed to clean, maintainable code.`];
+const BULLET_TEMPLATES=[input=>`• Developed ${input}, reducing manual effort by 35% and improving team productivity`,input=>`• Engineered ${input}, resulting in a 25% improvement in performance`];
+const PROJECT_TEMPLATES=[input=>`Engineered ${input} from scratch with user authentication and real-time sync. Deployed on cloud, used by 100+ users.`,input=>`Built ${input} as a full-stack app with RESTful API and offline support. Open-sourced with 50+ GitHub stars.`];
+function renderSuggestions(containerId,suggestions,onUse){const box=document.getElementById(containerId);if(!box)return;box.innerHTML=suggestions.map((text,i)=>`<div class="ai-suggestion" onclick="useSuggestion('${containerId}',${i})"><span style="flex:1">${esc(text)}</span><span class="use-btn">USE ↗</span></div>`).join('');box._suggestions=suggestions;box._onUse=onUse;}
+function useSuggestion(containerId,idx){const box=document.getElementById(containerId);if(!box||!box._suggestions)return;if(box._onUse)box._onUse(box._suggestions[idx]);}
+async function suggestSummary(){const input=v('summary-ai-input')||`${v('jobTitle')} with skills in ${v('extraSkills')}`;const role=v('jobTitle')||input;const skills=v('extraSkills')||input;const key=v('openai-key');if(key){await openAISuggest('summary',input,key);return;}renderSuggestions('summary-suggestions',SUMMARY_TEMPLATES.map(fn=>fn(role,skills)),text=>{document.getElementById('summary').value=text;live();updateATSScore();showToast('Summary applied!','success');});}
+async function suggestBullets(){const input=v('bullet-ai-input');if(!input){showToast('Enter a brief description first.');return;}const key=v('openai-key');if(key){await openAISuggest('bullets',input,key);return;}renderSuggestions('bullet-suggestions',BULLET_TEMPLATES.map(fn=>fn(input)),text=>{const tas=document.querySelectorAll('[id$="-desc"][id*="exp"]');if(tas.length){const last=tas[tas.length-1];last.value=(last.value?last.value+'\n':'')+text;live();updateATSScore();showToast('Bullet added!','success');}else showToast('Add an experience entry first.');});}
+async function suggestProject(){const input=v('proj-ai-input');if(!input){showToast('Enter a project description first.');return;}const key=v('openai-key');if(key){await openAISuggest('project',input,key);return;}renderSuggestions('proj-suggestions',PROJECT_TEMPLATES.map(fn=>fn(input)),text=>{const tas=document.querySelectorAll('[id$="-desc"][id*="proj"]');if(tas.length){tas[tas.length-1].value=text;live();updateATSScore();showToast('Applied!','success');}else showToast('Add a project entry first.');});}
+async function openAISuggest(type,input,key){const prompts={summary:`Generate 2 concise resume professional summaries for a "${input}". Each 2-3 sentences. Return only a JSON array of 2 strings.`,bullets:`Generate 2 strong resume bullet points for: "${input}". Start with action verbs, include metrics. Return only a JSON array of 2 strings.`,project:`Generate 2 compelling project descriptions (2-3 sentences) for: "${input}". Return only a JSON array of 2 strings.`};const containerId=type==='summary'?'summary-suggestions':type==='bullets'?'bullet-suggestions':'proj-suggestions';const box=document.getElementById(containerId);if(box)box.innerHTML=`<div style="text-align:center;padding:12px;color:var(--text3);font-size:12px"><span class="ai-spinner"></span> Generating with GPT-4…</div>`;try{const res=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'user',content:prompts[type]}],max_tokens:400})});const data=await res.json();if(data.error)throw new Error(data.error.message);const suggestions=JSON.parse(data.choices[0].message.content.trim());if(type==='summary'){renderSuggestions(containerId,suggestions,t=>{document.getElementById('summary').value=t;live();updateATSScore();showToast('Summary applied!','success');});}else if(type==='bullets'){renderSuggestions(containerId,suggestions,t=>{const tas=document.querySelectorAll('[id$="-desc"][id*="exp"]');if(tas.length){const l=tas[tas.length-1];l.value=(l.value?l.value+'\n':'')+t;live();updateATSScore();showToast('Added!','success');}});}else{renderSuggestions(containerId,suggestions,t=>{const tas=document.querySelectorAll('[id$="-desc"][id*="proj"]');if(tas.length){tas[tas.length-1].value=t;live();updateATSScore();showToast('Applied!','success');}});}}catch(e){if(box)box.innerHTML=`<div style="color:var(--red);font-size:12px;padding:10px">API Error: ${esc(e.message)}</div>`;}}
+
+// Auth Functions
+let authMode='login';
+function openAuth(mode){authMode=mode;const overlay=document.getElementById('authOverlay');const title=document.getElementById('authTitle');const sub=document.getElementById('authSub');const nameField=document.getElementById('authName');const actionBtn=document.getElementById('authActionBtn');const switchDiv=document.getElementById('authSwitch');if(mode==='login'){title.textContent='Welcome Back';sub.textContent='Sign in to continue building your resume';nameField.style.display='none';actionBtn.textContent='Sign In';switchDiv.innerHTML='No account? <a onclick="openAuth(\'register\')">Create one</a>';}else{title.textContent='Create Account';sub.textContent='Join ResumeForge and start crafting your perfect resume';nameField.style.display='block';actionBtn.textContent='Sign Up';switchDiv.innerHTML='Already have an account? <a onclick="openAuth(\'login\')">Sign in</a>';}overlay.style.display='flex';}
+function closeAuth(){document.getElementById('authOverlay').style.display='none';}
+function submitAuth(){const email=document.getElementById('authEmail').value.trim();const password=document.getElementById('authPassword').value;if(!email||!password){showToast('Please fill all fields','error');return;}if(authMode==='register'){const name=document.getElementById('authName').value.trim();if(!name){showToast('Please enter your name','error');return;}const users=JSON.parse(localStorage.getItem('resumeforge_users')||'{}');if(users[email]){showToast('Email already registered','error');return;}users[email]={name,password};localStorage.setItem('resumeforge_users',JSON.stringify(users));currentUser={email,name};localStorage.setItem('resumeforge_current_user',JSON.stringify(currentUser));showToast('Account created! Welcome!','success');closeAuth();showApp();}else{const users=JSON.parse(localStorage.getItem('resumeforge_users')||'{}');if(users[email]&&users[email].password===password){currentUser={email,name:users[email].name};localStorage.setItem('resumeforge_current_user',JSON.stringify(currentUser));showToast(`Welcome back, ${users[email].name}!`,'success');closeAuth();showApp();}else{showToast('Invalid email or password','error');}}}
+function logout(){localStorage.removeItem('resumeforge_current_user');currentUser=null;document.getElementById('mainApp').style.display='none';document.getElementById('landingPage').style.display='block';showToast('Logged out successfully');}
+function showApp(){document.getElementById('landingPage').style.display='none';document.getElementById('mainApp').style.display='block';document.getElementById('userAvatar').textContent=currentUser.name.charAt(0).toUpperCase();live();}
+function showLanding(){if(currentUser){if(confirm('Exit to homepage? Your resume data will be saved.')){document.getElementById('mainApp').style.display='none';document.getElementById('landingPage').style.display='block';}}}
+function initAuth(){const savedUser=localStorage.getItem('resumeforge_current_user');if(savedUser){currentUser=JSON.parse(savedUser);showApp();}else{document.getElementById('landingPage').style.display='block';document.getElementById('mainApp').style.display='none';}}
+initAuth();
 </script>
 </body>
 </html>

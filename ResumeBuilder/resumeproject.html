@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ResumeForge — AI-Powered Resume Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
@@ -216,6 +219,55 @@ textarea{min-height:80px;line-height:1.65}
 .tmpl-professional .r-org{font-size:12px;color:#1c6699;font-weight:500;margin-bottom:3px}
 .tmpl-professional .r-desc{font-size:11.5px;color:#3a3733;line-height:1.75;white-space:pre-wrap}
 
+
+/* TEMPLATE: CUSTOM */
+.tmpl-custom{background:#f9f7f4;font-family:'Plus Jakarta Sans',sans-serif;color:#1c1a17}
+.tmpl-custom .r-body{padding:48px 52px}
+.tmpl-custom .r-name{font-size:28px;font-weight:300;letter-spacing:-.02em;color:#1c1a17;margin-bottom:4px;margin-left:3px;}
+.tmpl-custom .r-jobtitle{font-size:13px;color:#7a756e;font-weight:400;margin-bottom:10px;letter-spacing:.04em;text-transform:uppercase}
+.tmpl-custom .r-contacts{display:flex;flex-wrap:wrap;gap:16px;font-size:11px;color:#0056b3;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid #ddd9d0}
+.tmpl-custom .r-section{margin-bottom:20px}
+.tmpl-custom .r-sec-title{font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b0aa9f;margin-bottom:12px}
+.tmpl-custom .r-summary-text{font-size:13px;color:#3a3733;line-height:1.8}
+.tmpl-custom .r-entry{margin-bottom:14px}
+.tmpl-custom .r-row{display:flex;justify-content:space-between;align-items:baseline}
+.tmpl-custom .r-role{font-size:13px;font-weight:500;color:#1c1a17}
+.tmpl-custom .r-date{font-size:11px;color:#b0aa9f}
+.tmpl-custom .r-org{font-size:12px;color:#7a756e;margin-bottom:4px}
+.tmpl-custom .r-desc{font-size:12px;color:#4a4640;line-height:1.75;white-space:pre-wrap}
+.tmpl-custom .r-skill-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tmpl-custom .r-skill-tag{font-size:11px;padding:4px 11px;background:#ece8e0;color:#4a4640;border-radius:2px}
+.tmpl-custom .r-skill-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.tmpl-custom .r-skill-bar-name{font-size:12px;color:#3a3733;min-width:120px}
+.tmpl-custom .r-skill-bar-track{flex:1;height:2px;background:#ddd9d0;border-radius:1px;overflow:hidden}
+.tmpl-custom .r-skill-bar-fill{height:100%;background:#1c1a17;border-radius:1px}
+ 
+/*colour picker */
+.topbar-center {display: flex;gap: 8px;align-items: center;position: relative}
+.colour-picker {display: none;align-items: center;gap: 8px;padding: 6px 10px;margin-left: 10px;background: #1e1d1a;border: 1px solid #383530;border-radius: 8px;height: 32px}
+.colour-picker label {font-size: 10px;color: #a09b90}
+.colour-picker input[type="color"] {width: 22px;height: 22px;border: none;cursor: pointer;background: none;padding: 0}
+
+#colourl {display: none;align-items: center;gap: 8px;padding: 6px 10px;margin-left: 10px;background: #1e1d1a;border: 1px solid #383530;border-radius: 8px;height: 32px}
+#colourl label {font-size: 10px;color: #a09b90}
+#colourl input[type="color"] {width: 22px;height: 22px;border: none;cursor: pointer;background: none;padding: 0}
+
+/*font selector*/
+#font{margin-left: 10px;border: 1px solid #383530;border-radius: 4px;height: 35px;width: 80px}
+.Oswald{font-family: "Oswald", sans-serif}
+.Playfair{font-family: "Playfair Display SC",serif;font-weight: 400;font-style: italic}
+
+/*Layout Switcher*/
+.two-col{display: grid;grid-template-columns: 220px 1fr;gap: 0;align-self: stretch}
+.left-col{background:rgb(230, 119, 119);padding: 20px;height: 100%}
+.right-col{padding: 20px;}
+#layout{display: flex;background:#1e1d1a;border-radius: 25px;border: 1px solid #383530;padding: 4px;gap: 4px;font-size: 13px}
+#layout input[type="radio"] {display: none}
+#layout label {padding: 6px 14px;border-radius: 20px;cursor: pointer;transition: all 0.3s ease;color: #ece8e0}
+#layout label:hover{background: #ddd; color: #383530}
+#layout label:has(input:checked){background: var(--gold-dim);color: var(--gold);border: 1px solid rgba(212,168,83,.4)}
+
+
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--r);padding:12px 18px;font-size:13px;color:var(--text2);box-shadow:0 8px 32px rgba(0,0,0,.4);opacity:0;pointer-events:none;transform:translateY(8px);transition:all .25s;z-index:999;max-width:300px}
 .toast.show{opacity:1;pointer-events:auto;transform:none}
@@ -246,6 +298,36 @@ textarea{min-height:80px;line-height:1.65}
     <button class="tpl-btn active" onclick="setTemplate('modern',this)">Modern</button>
     <button class="tpl-btn" onclick="setTemplate('minimal',this)">Minimal</button>
     <button class="tpl-btn" onclick="setTemplate('professional',this)">Professional</button>
+
+    <button class="tpl-btn" onclick="setTemplate('custom',this)">Custom</button>
+
+    <div class="colour-picker">
+      <input type="color" name="Custom color" id="colourPicker">
+      <label for="color" id="colourOutput">#000000</label>
+    </div>
+
+    <div>
+      <select id="font">
+        <option value="">Fonts</option>
+        <option class="Oswald" value="Oswald">Oswald</option>
+        <option class="Playfair" value="Playfair">Playfair</option>
+      </select>
+    </div>
+
+    <div id="layout">
+      <label id="single">
+        <input type="radio" name="layout" value="single" onchange="live()" checked>Single
+      </label>
+      <label id="double">
+        <input type="radio" name="layout" value="double" onchange="live()">Double
+      </label>
+    </div>
+
+    <div id="colourl">
+      <input type="color" id="leftColorPicker">
+      <label for="color" id="colourOutput">Left bar</label>
+    </div>
+
   </div>
   <div class="topbar-right">
     <div class="score-pill">Resume score <span class="score-num" id="score-num">0%</span></div>
@@ -668,10 +750,24 @@ function getSkillsMainHtml() {
 /* ── RENDERERS ── */
 function renderResume() {
   const paper = document.getElementById('resume-paper');
+  const picker = document.querySelector('.colour-picker');
+  const selector=document.getElementById('font')
+  const layout=document.getElementById('layout')
+  const colourl=document.getElementById('colourl')
+  const select=document.querySelector('input[name="layout"]:checked');
   paper.className = 'resume-paper tmpl-' + currentTemplate;
-  if (currentTemplate === 'professional') renderProfessional(paper);
-  else if (currentTemplate === 'minimal') renderMinimal(paper);
-  else renderModern(paper);
+  if(currentTemplate === 'professional'){renderProfessional(paper);} 
+  else if(currentTemplate === 'minimal'){renderMinimal(paper);} 
+  else if(currentTemplate === 'custom'){rendercustom(paper);} 
+  else{renderModern(paper);}
+  if(currentTemplate === 'custom'){picker.style.display= 'flex';} 
+  else{picker.style.display= 'none';paper.style.backgroundColor= '';}
+  if(currentTemplate === 'custom'){selector.style.display='flex';}
+  else{selector.style.display='none';paper.style.fontFamily= '';}
+  if(currentTemplate === 'custom'){layout.style.display= 'flex'}
+  else{layout.style.display='none'}
+  if(currentTemplate === 'custom'){if(select.value === 'double'){colourl.style.display= 'flex'}}
+  else{colourl.style.display='none'}
 }
 
 function renderModern(paper) {
@@ -716,6 +812,93 @@ function renderProfessional(paper) {
   sidebar += '</div>';
   paper.innerHTML = sidebar + `<div class="r-main">${getExpHtml()}${getEduHtml()}${getProjHtml()}${getCertHtml()}</div>`;
 }
+function rendercustom(paper) {
+  const name = [v('firstName'), v('lastName')].filter(Boolean).join(' ') || 'Your Name';
+  const layout = document.querySelector('input[name="layout"]:checked')?.value;
+  if (layout === 'double') {
+    paper.innerHTML = `
+      <div class="two-col">
+        <div class="left-col">
+          <div class="r-name">${esc(name)}</div>${v('jobTitle') ? `<div class="r-jobtitle">${esc(v('jobTitle'))}</div>` : ''}<div class="r-contacts">${getContactsHtml()}</div>
+          ${getSkillsMainHtml()}
+          ${getCertHtml()}
+        </div>
+        <div class="right-col">
+          <div class="r-body">
+            ${v('summary') ? `     
+              <div class="r-section">
+                <div class="r-sec-title">About</div><div class="r-summary-text">${esc(v('summary'))}</div>
+              </div>` : ''}
+            ${getExpHtml()}
+            ${getEduHtml()}
+            ${getProjHtml()}
+          </div>
+        </div>
+      </div>`;      
+  } else {       
+    let html = `<div class="r-body">
+      <div class="r-name">${esc(name)}</div>
+      ${v('jobTitle') ? `<div class="r-jobtitle">${esc(v('jobTitle'))}</div>` : ''}
+      <div class="r-contacts">${getContactsHtml()}</div>`;
+    if (v('summary')) {
+      html += `<div class="r-section">
+        <div class="r-sec-title">About</div>
+        <div class="r-summary-text">${esc(v('summary'))}</div>
+      </div>`;
+    }
+    html += getExpHtml() + getEduHtml() + getProjHtml() + getCertHtml() + getSkillsMainHtml() + '</div>';
+    paper.innerHTML = html;
+  }
+}
+
+/* COLOUR PICKER */
+function ColourPicker(){
+  const colorPicker=document.getElementById('colourPicker');
+  const colorOutput=document.getElementById('colourOutput');
+  const paper = document.getElementById('resume-paper');
+  colorPicker.addEventListener("input", () => {
+    colorOutput.innerText = colorPicker.value;
+    if (currentTemplate === 'custom'){paper.style.backgroundColor = colorPicker.value;}
+  });
+}
+ColourPicker();
+
+/* FONT SELECTOR */
+function FontSelctor(){
+  const font=document.getElementById('font');
+  const paper = document.getElementById('resume-paper');
+  font.addEventListener("change", () => {
+    if(currentTemplate === 'custom'){paper.style.fontFamily=font.value;}
+  });
+}
+FontSelctor()
+
+/* LAYOUT SWITCHER */
+function LayoutSwitcher(){
+  const Layout=document.getElementById('layout')
+  const paper=document.getElementById('resume-paper')
+  Layout.addEventListener("change",()=>{
+    if(currentTemplate === 'custom'){
+      const select=document.querySelector('input[name="layout"]:checked');
+      if(select.value === 'double'){paper.classList.add("two-col");}
+      else{paper.classList.remove("two-col");}
+    }
+  });
+}
+LayoutSwitcher()
+
+/*LEFT COLOUMN COLOUR*/
+function Leftcol(){
+  const picker = document.getElementById('leftColorPicker');
+  picker.addEventListener("input", () => {
+    if(currentTemplate === 'custom'){
+      const layout = document.querySelector('input[name="layout"]:checked')?.value;
+      if(layout === 'double'){
+        const leftCol = document.querySelector('.left-col');
+        if(leftCol){leftCol.style.backgroundColor = picker.value;}}}
+  });
+}
+Leftcol();
 
 /* ── TEMPLATE SWITCHER ── */
 function setTemplate(name, btn) {

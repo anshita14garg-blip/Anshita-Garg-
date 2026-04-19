@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeForge — Smart Resume Builder</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo-wrap">
+    <div class="logo-icon">📄</div>
+    <div class="logo-text">Resume<span>Forge</span></div>
+  </div>
+  <div class="topbar-center">
+    <button class="tpl-btn active" onclick="setTemplate('modern',this)">Modern</button>
+    <button class="tpl-btn" onclick="setTemplate('minimal',this)">Minimal</button>
+    <button class="tpl-btn" onclick="setTemplate('professional',this)">Professional</button>
+  </div>
+  <div class="topbar-right">
+    <div class="score-pill">Resume score <span class="score-num" id="score-num">0%</span></div>
+    <button class="btn btn-ghost" onclick="exportPDF()">⬇ Export PDF</button>
+  </div>
+</header>
+
+<div class="app-grid">
+
+  <nav class="sidebar">
+    <div class="sb-group-label">Sections</div>
+    <div class="nav-item active" id="nav-basics" onclick="showPanel('basics',this)"><div class="nav-icon">👤</div> Contact Info<span class="check">✓</span></div>
+    <div class="nav-item" id="nav-summary" onclick="showPanel('summary',this)"><div class="nav-icon">✏️</div> Summary<span class="check">✓</span></div>
+    <div class="nav-item" id="nav-experience" onclick="showPanel('experience',this)"><div class="nav-icon">💼</div> Experience<span class="check">✓</span></div>
+    <div class="nav-item" id="nav-education" onclick="showPanel('education',this)"><div class="nav-icon">🎓</div> Education<span class="check">✓</span></div>
+    <div class="nav-item" id="nav-skills" onclick="showPanel('skills',this)"><div class="nav-icon">⚡</div> Skills<span class="check">✓</span></div>
+    <div class="nav-item" id="nav-projects" onclick="showPanel('projects',this)"><div class="nav-icon">🚀</div> Projects<span class="check">✓</span></div>
+    <div class="nav-item" id="nav-certifications" onclick="showPanel('certifications',this)"><div class="nav-icon">🏅</div> Certifications<span class="check">✓</span></div>
+    <div class="sb-sep"></div>
+    <div class="sb-group-label">Visibility</div>
+    <div class="section-toggle"><span class="toggle-label">Show Projects</span><button class="toggle-switch on" id="tog-projects" onclick="toggleSection('projects',this)"></button></div>
+    <div class="section-toggle"><span class="toggle-label">Show Certifications</span><button class="toggle-switch on" id="tog-certifications" onclick="toggleSection('certifications',this)"></button></div>
+    <div class="section-toggle"><span class="toggle-label">Skill Bars</span><button class="toggle-switch on" id="tog-skillbars" onclick="toggleSkillBars(this)"></button></div>
+    <div class="sb-sep"></div>
+    <div class="sb-group-label">AI Settings</div>
+    <div style="padding:0 6px">
+      <div class="field" style="margin-bottom:8px">
+        <label>OpenAI API Key <span style="color:var(--text3);font-size:9px;text-transform:none">(optional)</span></label>
+        <input type="password" id="openai-key" placeholder="sk-..." style="font-size:11px;padding:7px 10px">
+      </div>
+      <div class="api-note">Leave blank for rule-based suggestions. Add key for GPT-4 suggestions.</div>
+    </div>
+  </nav>
+
+  <div class="editor" id="editor">
+
+    <div class="section-panel active" id="panel-basics">
+      <div class="panel-head"><div class="panel-title">Contact Info</div><div class="panel-desc">Your name and details appear at the very top of your resume.</div></div>
+      <div class="row2">
+        <div class="field"><label>First Name</label><input id="firstName" placeholder="Aanya" oninput="live()"></div>
+        <div class="field"><label>Last Name</label><input id="lastName" placeholder="Sharma" oninput="live()"></div>
+      </div>
+      <div class="field"><label>Job Title / Role</label><input id="jobTitle" placeholder="Full-Stack Developer" oninput="live()"></div>
+      <div class="row2">
+        <div class="field"><label>Email</label><input id="email" type="email" placeholder="aanya@example.com" oninput="live()"></div>
+        <div class="field"><label>Phone</label><input id="phone" placeholder="+91 98765 43210" oninput="live()"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Location</label><input id="location" placeholder="Bengaluru, India" oninput="live()"></div>
+        <div class="field"><label>LinkedIn</label><input id="linkedin" placeholder="linkedin.com/in/aanya" oninput="live()"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>GitHub</label><input id="github" placeholder="github.com/aanya" oninput="live()"></div>
+        <div class="field"><label>Portfolio / Website</label><input id="website" placeholder="aanya.dev" oninput="live()"></div>
+      </div>
+    </div>
+
+    <div class="section-panel" id="panel-summary">
+      <div class="panel-head"><div class="panel-title">Professional Summary</div><div class="panel-desc">2–3 punchy sentences. Highlight your experience, key skills, and what makes you stand out.</div></div>
+      <div class="field"><label>Summary</label><textarea id="summary" rows="5" placeholder="Passionate full-stack developer with 3+ years building scalable web applications..." oninput="live()"></textarea></div>
+      <div class="ai-box">
+        <div class="ai-box-head"><span class="ai-badge">✦ AI</span><span class="ai-box-title">Smart suggestions for your summary</span></div>
+        <div class="ai-input-row">
+          <input type="text" id="summary-ai-input" placeholder="Type your role or key skills (e.g. React developer, 3 years)">
+          <button class="btn btn-teal" onclick="suggestSummary()" style="white-space:nowrap;font-size:12px">Suggest</button>
+        </div>
+        <div class="ai-suggestions" id="summary-suggestions"></div>
+      </div>
+    </div>
+
+    <div class="section-panel" id="panel-experience">
+      <div class="panel-head"><div class="panel-title">Work Experience</div><div class="panel-desc">Most recent first. Focus on impact — use numbers when you can.</div></div>
+      <div class="entries" id="exp-entries"></div>
+      <button class="add-entry" onclick="addExp()">＋ Add work experience</button>
+      <div class="ai-box" style="margin-top:18px">
+        <div class="ai-box-head"><span class="ai-badge">✦ AI</span><span class="ai-box-title">Auto-generate bullet points</span></div>
+        <div class="ai-input-row">
+          <input type="text" id="bullet-ai-input" placeholder="e.g. Built React dashboard, reduced load time">
+          <button class="btn btn-teal" onclick="suggestBullets()" style="white-space:nowrap;font-size:12px">Suggest</button>
+        </div>
+        <div class="ai-suggestions" id="bullet-suggestions"></div>
+      </div>
+    </div>
+
+    <div class="section-panel" id="panel-education">
+      <div class="panel-head"><div class="panel-title">Education</div><div class="panel-desc">Degrees, courses, and academic highlights.</div></div>
+      <div class="entries" id="edu-entries"></div>
+      <button class="add-entry" onclick="addEdu()">＋ Add education</button>
+    </div>
+
+    <div class="section-panel" id="panel-skills">
+      <div class="panel-head"><div class="panel-title">Skills</div><div class="panel-desc">Add skill bars to visually show proficiency, or use plain tags.</div></div>
+      <div id="skill-bars-section">
+        <div class="sb-group-label" style="padding:0 0 8px">Skill Bars (with proficiency)</div>
+        <div class="skill-bar-wrap" id="skill-bar-list"></div>
+        <button class="add-entry" onclick="addSkillBar()" style="margin-bottom:18px">＋ Add skill with bar</button>
+      </div>
+      <div class="field"><label>Additional Skills (comma separated)</label><textarea id="extraSkills" rows="2" placeholder="Git, Docker, Agile, REST APIs, MySQL" oninput="live()"></textarea></div>
+      <div class="field"><label>Languages</label><input id="languages" placeholder="English (Fluent), Hindi (Native)" oninput="live()"></div>
+    </div>
+
+    <div class="section-panel" id="panel-projects">
+      <div class="panel-head"><div class="panel-title">Projects</div><div class="panel-desc">Personal, freelance, or open-source work that shows your abilities.</div></div>
+      <div class="entries" id="proj-entries"></div>
+      <button class="add-entry" onclick="addProj()">＋ Add project</button>
+      <div class="ai-box" style="margin-top:18px">
+        <div class="ai-box-head"><span class="ai-badge">✦ AI</span><span class="ai-box-title">Improve project descriptions</span></div>
+        <div class="ai-input-row">
+          <input type="text" id="proj-ai-input" placeholder="e.g. E-commerce app using React and Firebase">
+          <button class="btn btn-teal" onclick="suggestProject()" style="white-space:nowrap;font-size:12px">Suggest</button>
+        </div>
+        <div class="ai-suggestions" id="proj-suggestions"></div>
+      </div>
+    </div>
+
+    <div class="section-panel" id="panel-certifications">
+      <div class="panel-head"><div class="panel-title">Certifications</div><div class="panel-desc">Professional certificates and online courses.</div></div>
+      <div class="entries" id="cert-entries"></div>
+      <button class="add-entry" onclick="addCert()">＋ Add certification</button>
+    </div>
+
+  </div>
+
+  <div class="preview-wrap" id="preview-wrap">
+    <div id="resume-paper" class="resume-paper tmpl-modern"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="export-loading" id="export-loading">
+  <div class="export-loading-ring"></div>
+  <p>Generating your PDF…</p>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
